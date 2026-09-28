@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>ABOUT ME — A Cinematic Identity Film · Venkatesh Ammireddy</title>
+<meta name="description" content="A 75-second cinematic motion identity film built entirely with code. Text + particles + camera + light." />
+<link rel="icon" type="image/svg+xml" href="https://venkateshcreations.github.io/portfolio/favicon.svg" />
+<link rel="apple-touch-icon" href="https://venkateshcreations.github.io/portfolio/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Newsreader:ital,opsz,wght@1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050506; --ink:#f4f1ea; --muted:rgba(244,241,234,.55);
+  --accent:#ffb37a; --accent2:#7b86ff;
+  --font-display:"Anton","Arial Narrow","Helvetica Condensed",Helvetica,Arial,sans-serif;
+  --font-serif:"Newsreader",Georgia,serif;
+  --font-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+html{background:#000}
+body{
+  font-family:var(--font-display);
+  background:#000;color:var(--ink);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+  cursor:crosshair;
+}
+/* scroll gives the film its scrub track. Autoplay remains primary. */
+#scroll-track{position:relative;height:720vh;width:100%;background:#000}
+#stage{
+  position:sticky;top:0;height:100vh;height:100svh;width:100%;
+  overflow:hidden;isolation:isolate;background:var(--bg);
+  transition:background-color .2s linear;
+}
+/* ---------- CAMERA RIG : 4 depth layers ---------- */
+#viewport{position:absolute;inset:0;display:grid;place-items:center;perspective:1400px;z-index:1}
+#camera{position:absolute;inset:0;display:grid;place-items:center;transform-style:preserve-3d;will-change:transform}
+.layer{position:absolute;inset:0;display:grid;place-items:center;will-change:transform,opacity;transform-style:preserve-3d}
+#layer-atmo{will-change:transform,opacity}
+/* liquid smoke — a blurred fluid color field (atmosphere/light only, never a shape).
+   Rendered tiny and upscaled so no edge or object can ever read as geometry. */
+#smoke{position:absolute;top:-6%;left:-6%;width:112%;height:112%;
+  filter:blur(26px) saturate(1.45);opacity:var(--smoke-op,.45);will-change:opacity}
+.atmo-glow{
+  position:absolute;inset:-25%;pointer-events:none;
+  background:
+    radial-gradient(42% 34% at 50% 42%, var(--glow,rgba(255,255,255,.08)) 0%, transparent 68%),
+    radial-gradient(60% 50% at 78% 82%, var(--leak,rgba(255,140,60,.05)) 0%, transparent 70%),
+    radial-gradient(55% 45% at 18% 18%, var(--leak2,rgba(120,130,255,.06)) 0%, transparent 70%);
+  filter:blur(10px);will-change:opacity,transform;
+}
+#atmo-word{
+  position:absolute;font-family:var(--font-display);font-size:24vw;line-height:.8;letter-spacing:-.02em;
+  color:transparent;-webkit-text-stroke:1px currentColor;opacity:.055;white-space:nowrap;
+  filter:blur(3px);user-select:none;pointer-events:none;
+}
+/* particle canvases */
+canvas.dust{position:absolute;inset:0;width:100%;height:100%;display:block}
+/* ---------- TYPO STAGE ---------- */
+#typo-layer{pointer-events:none;text-align:center;z-index:5}
+.typo-stack{position:relative;width:min(1240px,94vw);height:min(78vh,740px);display:grid;place-items:center}
+.scene{
+  position:absolute;inset:0;display:grid;place-items:center;align-content:center;justify-items:center;
+  opacity:0;visibility:hidden;text-align:center;will-change:transform,opacity,filter;pointer-events:none;
+}
+.scene.active{visibility:visible}
+.scene>div{width:100%;max-width:1150px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.kicker{font-family:var(--font-mono);font-size:clamp(9px,1.1vw,12px);letter-spacing:.44em;text-transform:uppercase;color:var(--muted);margin-bottom:2.4vh}
+.kicker b{color:var(--ink);font-weight:400}
+.rule{width:52px;height:1px;background:currentColor;opacity:.3;margin:0 auto 2.4vh}
+h1,h2{font-weight:400;text-transform:uppercase;line-height:.88;letter-spacing:-.01em}
+.about{font-size:clamp(46px,9.5vw,138px);display:flex;gap:.03em;justify-content:center}
+.about .ch{display:inline-block;will-change:transform,opacity,filter}
+.me{font-size:clamp(120px,26vw,380px);line-height:.8}
+.me .ch{display:inline-block;will-change:transform,opacity,filter}
+.sentence{font-size:clamp(30px,5.6vw,86px);line-height:.94;max-width:20ch;margin:0 auto}
+.sentence .w{display:inline-block;white-space:nowrap;margin:0 .16em}
+.sentence .ch{display:inline-block;will-change:transform,opacity,filter}
+.giant{font-size:clamp(64px,14vw,230px);line-height:.84}
+.giant .ch{display:inline-block;will-change:transform,opacity,filter}
+.vert-compress{display:block;transform-origin:center}
+/* INTELLIGENCE: 12 letters locked to one monumental line — never wraps mid-word */
+#t-b-giant{white-space:nowrap;font-size:clamp(38px,11vw,190px);max-width:none}
+#t-open-b{white-space:nowrap;font-size:clamp(38px,10.5vw,180px);max-width:none}
+.sub{font-family:var(--font-mono);font-size:clamp(10px,1.2vw,13px);letter-spacing:.3em;text-transform:uppercase;color:var(--muted);margin-top:2.6vh}
+.serif-accent{font-family:var(--font-serif);font-style:italic;font-weight:300;text-transform:none;letter-spacing:0}
+.identity-name{font-size:clamp(34px,6.6vw,102px);line-height:1;letter-spacing:.005em}
+.identity-name .ch{display:inline-block;will-change:transform,opacity,filter}
+.roles{margin-top:3.2vh;display:flex;flex-direction:column;gap:1.4vh;align-items:center}
+.roles span{font-family:var(--font-mono);font-size:clamp(11px,1.6vw,16px);letter-spacing:.34em;text-transform:uppercase;opacity:0}
+.philo{font-size:clamp(30px,5.4vw,80px)}
+.philo .ch{display:inline-block}
+.cta{font-size:clamp(36px,7vw,112px);line-height:.9}
+.cta .ch{display:inline-block}
+.cta .emph{color:var(--accent)}
+/* white edge stroke on the end titles — bright outline ringing each letterform */
+#t-cta-a,#t-cta-b,#t-cta-c{-webkit-text-stroke:1.5px var(--edge,rgba(255,255,255,.9));paint-order:stroke fill;
+  text-shadow:var(--type-glow,none)}
+#t-sign{-webkit-text-stroke:1px var(--edge,rgba(255,255,255,.8));paint-order:stroke fill}
+.small-name{font-family:var(--font-mono);font-size:12px;letter-spacing:.5em;text-transform:uppercase;color:var(--muted)}
+/* SVG typographic connection — a single drawn path between words, not a shape system */
+#connect-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:2}
+/* ---------- ATMOSPHERE OVERLAYS : light only, no geometry ---------- */
+#read-scrim{position:absolute;inset:0;z-index:4;pointer-events:none;
+  background:radial-gradient(58% 46% at 50% 48%, var(--scrim,rgba(0,0,0,.38)) 0%, transparent 70%);
+  opacity:var(--scrim-op,.9);will-change:opacity}
+/* purely photographic light washes — no geometry, just exposure + lens artifacts */
+#exposure{position:absolute;inset:0;z-index:26;pointer-events:none;background:#fffdf8;opacity:0;will-change:opacity}
+#anamorphic{position:absolute;inset:0;z-index:21;pointer-events:none;opacity:0;will-change:opacity;
+  background:
+    radial-gradient(55% 7% at 50% 46%, rgba(255,255,255,.55) 0%, transparent 70%),
+    radial-gradient(90% 12% at 50% 46%, var(--accent) 0%, transparent 72%);
+  mix-blend-mode:screen;filter:blur(6px)}
+#act-card{position:absolute;left:50%;bottom:132px;transform:translateX(-50%);z-index:51;pointer-events:none;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.5em;text-transform:uppercase;color:var(--muted);
+  text-shadow:var(--type-glow,none);opacity:0;white-space:nowrap;transition:opacity .5s ease}
+#act-card b{color:var(--ink);font-weight:400}
+#vignette{position:absolute;inset:0;z-index:20;pointer-events:none;
+  background:radial-gradient(92% 92% at 50% 48%, transparent 52%, rgba(0,0,0,.42) 100%);will-change:opacity}
+/* readability: every label carries a soft glow so it survives any grade blend */
+.scene h1,.scene h2{text-shadow:var(--type-glow,none)}
+.kicker,.sub,.small-name{text-shadow:var(--type-glow,none)}
+.giant{filter:drop-shadow(0 0 26px var(--accent-glow,transparent))}
+#fade-black{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:25}
+#stage::after{ /* animated film grain — light texture only, no geometry */
+  content:"";position:absolute;inset:-60px;z-index:30;pointer-events:none;opacity:.09;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  animation:grainShift 0.9s steps(4) infinite;
+  will-change:transform;
+}
+@keyframes grainShift{
+  0%{transform:translate(0,0)}25%{transform:translate(-18px,12px)}
+  50%{transform:translate(14px,-16px)}75%{transform:translate(-10px,-8px)}100%{transform:translate(0,0)}
+}
+.atmo-glow{animation:glowBreathe 7s ease-in-out infinite;will-change:transform,opacity}
+@keyframes glowBreathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.06);opacity:1}}
+#loop-badge{opacity:.6}
+/* spotlight — a cursor-following light wash; pure light, no geometry */
+#spot{position:absolute;left:0;top:0;width:62vmax;height:62vmax;z-index:18;pointer-events:none;
+  mix-blend-mode:screen;opacity:.35;will-change:transform,opacity;
+  background:radial-gradient(circle,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 38%,transparent 62%)}
+.tick{position:absolute;top:-3px;width:1px;height:8px;background:currentColor;opacity:.35;pointer-events:none}
+body.clean{cursor:none}
+body.clean #chrome,body.clean #hint,body.clean #act-card,body.clean #portfolio-cta{opacity:0!important;pointer-events:none}
+#help{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:70;display:none;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;line-height:2.2;text-transform:uppercase;
+  color:var(--ink);background:rgba(10,10,12,.84);background:color-mix(in srgb, var(--bg) 82%, transparent);
+  border:1px solid var(--muted);border-radius:14px;padding:22px 30px;backdrop-filter:blur(14px);text-align:left}
+#help.show{display:block}
+#help b{color:var(--accent);font-weight:400;margin-right:14px}
+/* ---------- MINIMAL TRANSPORT (auto-hides; film has no UI cards/buttons) ---------- */
+#chrome{position:absolute;inset:0;z-index:50;pointer-events:none;display:flex;flex-direction:column;justify-content:space-between;padding:22px 26px;opacity:0;transition:opacity .6s ease}
+body.awake #chrome{opacity:1}
+#topbar{display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:10px;letter-spacing:.32em;text-transform:uppercase;color:var(--muted)}
+#topbar b{color:var(--ink);font-weight:400}
+#controls{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;pointer-events:auto}
+#track{height:2px;background:rgba(128,128,128,.35);background:color-mix(in srgb, currentColor 22%, transparent);border-radius:99px;position:relative;cursor:pointer;flex:1;max-width:600px;color:var(--ink)}
+#fill{position:absolute;inset:0;background:var(--ink);transform-origin:left;transform:scaleX(0);border-radius:99px}
+#btns{display:flex;gap:10px}
+.btn{font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;border:1px solid rgba(128,128,128,.45);border:1px solid color-mix(in srgb, currentColor 30%, transparent);background:color-mix(in srgb, var(--bg) 30%, transparent);color:var(--ink);border-radius:999px;padding:10px 18px;cursor:pointer;backdrop-filter:blur(8px);text-shadow:var(--type-glow,none)}
+.btn:hover{background:var(--ink);color:var(--bg)}
+/* portfolio CTA — pinned under the hint line, always visible (outside the auto-hiding chrome) */
+#portfolio-cta{position:absolute;left:50%;bottom:50px;transform:translateX(-50%);z-index:52;pointer-events:auto;cursor:pointer;
+  font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;white-space:nowrap;
+  color:var(--ink);border:1px solid var(--accent);border-radius:999px;padding:10px 22px;
+  background:rgba(10,10,12,.25);background:color-mix(in srgb, var(--bg) 35%, transparent);
+  backdrop-filter:blur(8px);text-shadow:var(--type-glow,none)}
+#portfolio-cta:hover{background:var(--accent);border-color:var(--accent);color:#0b0b0e}
+@media (max-width:640px){#portfolio-cta{bottom:112px}}
+#hint{position:absolute;left:50%;bottom:104px;transform:translateX(-50%);z-index:51;font-family:var(--font-mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;color:var(--muted);pointer-events:none;animation:float 3s ease-in-out infinite;transition:opacity 1s}
+@keyframes float{50%{transform:translate(-50%,7px)}}
+#toast{position:absolute;left:50%;top:70px;transform:translateX(-50%);background:var(--ink);color:var(--bg);font-family:var(--font-mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;padding:10px 18px;border-radius:99px;opacity:0;transition:.4s;z-index:60;pointer-events:none}
+#toast.show{opacity:1}
+#loader{position:absolute;inset:0;background:#050506;color:#f4f1ea;z-index:100;display:grid;place-items:center;transition:opacity .9s ease,visibility .9s}
+#loader.hide{opacity:0;visibility:hidden}
+#leader{font-size:clamp(84px,18vw,220px);line-height:1;margin-top:6px;animation:leaderPulse .36s var(--ease)}
+@keyframes leaderPulse{0%{transform:scale(1.3);opacity:0}30%{opacity:1}100%{transform:scale(1);opacity:1}}
+body.lowq #stage::after{animation:none}
+body.lowq #anamorphic{display:none}
+@media (max-width:640px){ #chrome{padding:16px} #hint{display:none} }
+</style>
+</head>
+<body class="awake">
+<div id="scroll-track">
+  <div id="stage" aria-label="About Me — cinematic identity film">
+    <div id="viewport">
+      <div id="camera">
+        <div class="layer" id="layer-atmo" data-depth="0.10">
+          <canvas id="smoke" aria-hidden="true"></canvas>
+          <div class="atmo-glow" id="atmo-glow"></div>
+          <div id="atmo-word" aria-hidden="true">DESIGN</div>
+        </div>
+        <div class="layer" id="layer-back" data-depth="0.24">
+          <canvas class="dust" id="dust-back"></canvas>
+        </div>
+        <div class="layer" id="typo-layer" data-depth="0.48">
+          <div class="typo-stack" id="typo-stack">
+            <svg id="connect-svg" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+              <defs>
+                <filter id="type-distort" x="-20%" y="-20%" width="140%" height="140%">
+                  <feTurbulence id="dist-turb" type="fractalNoise" baseFrequency="0.012 0.09" numOctaves="2" seed="7" result="n"/>
+                  <feDisplacementMap id="dist-map" in="SourceGraphic" in2="n" scale="0" xChannelSelector="R" yChannelSelector="G"/>
+                </filter>
+                <linearGradient id="ink-grad" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="currentColor"/><stop offset="1" stop-color="currentColor"/>
+                </linearGradient>
+              </defs>
+              <path id="connect-path" d="M 140 330 C 360 290, 640 370, 860 320" fill="none" stroke="currentColor" stroke-width="1.4" opacity="0" stroke-dasharray="6 7"/>
+              <path id="ai-path" d="M 200 420 C 400 380, 600 460, 800 400" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0" stroke-dasharray="3 8"/>
+            </svg>
+          </div>
+        </div>
+        <div class="layer" id="layer-front" data-depth="0.92">
+          <canvas class="dust" id="dust-front"></canvas>
+        </div>
+      </div>
+    </div>
+    <div id="read-scrim"></div>
+    <div id="spot" aria-hidden="true"></div>
+    <div id="vignette"></div>
+    <div id="anamorphic"></div>
+    <div id="fade-black"></div>
+    <div id="exposure"></div>
+    <div id="act-card"><b id="act-name">ACT I — CRAFT</b></div>
+    <div id="chrome">
+      <div id="topbar"><div>ABOUT&nbsp;ME&nbsp;&nbsp;·&nbsp;&nbsp;<b id="ch-name">OPENING</b></div><div><b id="tc">00:00</b>&nbsp;&nbsp;·&nbsp;&nbsp;<span id="ch-num">SC 01 / 10</span>&nbsp;&nbsp;·&nbsp;&nbsp;<span id="loop-badge">LOOP 01</span>&nbsp;&nbsp;·&nbsp;&nbsp;<span style="opacity:.6">24FPS · 2.39:1</span></div></div>
+      <div id="controls">
+        <div id="track" title="Scrub film"><div id="fill"></div></div>
+        <div id="btns">
+          <button class="btn" id="btn-sound">SOUND ON</button>
+          <button class="btn" id="btn-mode">AUTO ▸ SCROLL</button>
+          <button class="btn" id="btn-play">PAUSE</button>
+        </div>
+      </div>
+    </div>
+    <div id="hint">Move to look · Scroll to travel</div>
+    <button id="portfolio-cta">PORTFOLIO ↗</button>
+    <div id="help"><div><b>SPACE</b>PLAY / PAUSE</div><div><b>← →</b>∓ 1.5 SECONDS</div><div><b>1 – 0</b>JUMP TO CHAPTER</div><div><b>H</b>CLEAN CAPTURE MODE</div><div><b>?</b>THIS PANEL</div></div>
+    <div id="toast"></div>
+    <div id="loader"><div style="text-align:center">
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.44em;opacity:.6">A MOTION FILM IN CODE</div>
+      <div id="leader">3</div>
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:.44em;opacity:.6;margin-top:14px">PICTURE START · ABOUT ME</div>
+    </div></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* =====================================================================
+   CENTRALIZED TIMELINE — modify timing / text / colour in one place.
+   Total film: 75 seconds. prog = time / duration.
+===================================================================== */
+const CONFIG = {
+  duration: 75,
+  timeline: [
+    { id:"s01", t0:0,  t1:4,   label:"OPENING",       scene:"opening" },
+    { id:"s02", t0:4,  t1:9,   label:"DESIGN",        scene:"design" },
+    { id:"s03", t0:9,  t1:14,  label:"ARCHITECT",     scene:"architect" },
+    { id:"s04", t0:14, t1:20,  label:"CONNECT",       scene:"connect" },
+    { id:"s05", t0:20, t1:27,  label:"AI-DRIVEN",     scene:"ai" },
+    { id:"s06", t0:27, t1:33,  label:"INTELLIGENCE",  scene:"build" },
+    { id:"s07", t0:33, t1:42,  label:"IDENTITY",      scene:"identity" },
+    { id:"s08", t0:42, t1:46.5,label:"PRINCIPLES",    scene:"principles" },
+    { id:"s09", t0:46.5,t1:55, label:"PHILOSOPHY",    scene:"philo" },
+    { id:"s10", t0:55, t1:60,  label:"OPEN",          scene:"open" },
+    { id:"s11", t0:60, t1:65,  label:"PROMISE",       scene:"promise" },
+    { id:"s12", t0:65, t1:73,  label:"FINAL",         scene:"final" },
+    { id:"s13", t0:73, t1:75,  label:"SIGN-OFF",      scene:"signoff" },
+  ],
+  /* cinematic colour journey — bg / ink / accent per chapter */
+  grade: [
+    { until:4,          bg:"#050506", ink:"#f4f1ea", accent:"#f4f1ea", glow:"rgba(255,255,255,.07)", word:"SILENCE" },
+    { until:9,          bg:"#f2efe9", ink:"#111014", accent:"#c8500e", glow:"rgba(200,80,14,.10)",  word:"DESIGN" },
+    { until:14,         bg:"#eceae6", ink:"#141318", accent:"#8a4a12", glow:"rgba(160,120,60,.10)", word:"SYSTEM" },
+    { until:20,         bg:"#e9e7e2", ink:"#101014", accent:"#b0490f", glow:"rgba(180,90,20,.10)",  word:"CRAFT" },
+    { until:27,         bg:"#0a1028", ink:"#eef0ff", accent:"#8f7bff", glow:"rgba(120,130,255,.16)",word:"SIGNAL" },
+    { until:33,         bg:"#0a0a0c", ink:"#f2f1ec", accent:"#c9a86a", glow:"rgba(220,190,140,.08)",word:"MIND" },
+    { until:42,         bg:"#060607", ink:"#f4f1ea", accent:"#f4f1ea", glow:"rgba(255,255,255,.06)",word:"NAME" },
+    { until:46.5,       bg:"#0e0d0c", ink:"#f2ede6", accent:"#e0913d", glow:"rgba(224,150,60,.12)", word:"PROOF" },
+    { until:55,         bg:"#0b0b0e", ink:"#ece9e2", accent:"#9aa0ff", glow:"rgba(150,150,255,.08)",word:"HUMAN" },
+    { until:60,         bg:"#f3ede2", ink:"#161310", accent:"#d65400", glow:"rgba(214,84,0,.12)",   word:"OPEN" },
+    { until:65,         bg:"#100d0b", ink:"#f4ece0", accent:"#ff9a3d", glow:"rgba(255,150,60,.14)", word:"VOW" },
+    { until:73,         bg:"#f6f1e8", ink:"#141210", accent:"#e05a00", glow:"rgba(224,90,0,.12)",   word:"YET" },
+    { until:76,         bg:"#000000", ink:"#f4f1ea", accent:"#f4f1ea", glow:"rgba(255,255,255,.05)",word:"" },
+  ]
+};
+
+const state = {
+  time: 0, playing: true, scrollMode: false,
+  pointer: { x:0, y:0, tx:0, ty:0 },
+  cam: { scale:1, x:0, y:0, rot:0 },
+  camPrev: { scale:1, x:0, y:0 }, camVel: 0, // camera velocity → motion blur + warp coupling
+  warp: 0, // particle warp energy 0..1
+  loops: 1, scrollTarget: 0, // endless-loop count + smoothed scroll scrub
+  reduced: matchMedia("(prefers-reduced-motion: reduce)").matches,
+  mobile: matchMedia("(max-width: 640px)").matches || ("ontouchstart" in window),
+  visible: true, destroyed: false, lastTs: 0,
+  idleTimer: 0, music: true, musicScene: null,
+  punch: 0, dutch: 0, shock: 0, shockWas: false, // story-turn impulses
+  quality: "high", fpsEMA: 60, qCool: 0, smokeSkip: 2, smokeOct: 3 // adaptive quality
+};
+const QT={ // adaptive tiers: particles back/front, smoke stride/octaves
+  high:  { pb:64, pf:44, ss:2, oct:3 },
+  medium:{ pb:40, pf:28, ss:3, oct:2 },
+  low:   { pb:22, pf:14, ss:5, oct:2 }
+};
+const GLYPHS="VENKATESHMIRDUX0123456789+×·"; // typographic dust — letters as atmosphere
+const $ = s => document.querySelector(s);
+const lerp = (a,b,t)=>a+(b-a)*t;
+const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
+const seg = (p,a,b)=>clamp((p-a)/(b-a),0,1);
+const eo = t => t>=1?1:1-Math.pow(2,-10*t);                    // cinematic ease-out
+const eio = t => t<.5 ? 4*t*t*t : 1-Math.pow(-2*t+2,3)/2;      // in-out
+const spring = t => { const c=1.45; t=clamp(t,0,1); return 1+(c+1)*Math.pow(t-1,3)+c*Math.pow(t-1,2); };
+function hexLerp(h1,h2,t){
+  const p=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+  const a=p(h1),b=p(h2);
+  return `rgb(${Math.round(lerp(a[0],b[0],t))},${Math.round(lerp(a[1],b[1],t))},${Math.round(lerp(a[2],b[2],t))})`;
+}
+function gradeAt(sec){
+  for(let i=0;i<CONFIG.grade.length;i++){
+    if(sec < CONFIG.grade[i].until){
+      const cur = CONFIG.grade[i], prev = CONFIG.grade[Math.max(0,i-1)];
+      const spanStart = i===0?0:CONFIG.grade[i-1].until;
+      const blend = seg(sec, cur.until-1.2, cur.until); // smooth 1.2s colour transition on scene change
+      return { cur, prev, blend };
+    }
+  }
+  return { cur:CONFIG.grade.at(-1), prev:CONFIG.grade.at(-1), blend:0 };
+}
+function sceneAt(sec){
+  for(const s of CONFIG.timeline) if(sec>=s.t0 && sec<s.t1) return s;
+  return CONFIG.timeline.at(-1);
+}
+
+/* =====================================================================
+   SCENE FACTORY — createScene() + createTextAnimation()
+===================================================================== */
+const stack = $("#typo-stack");
+const S = { all: [], byId: {} };
+function splitChars(el){
+  const txt = el.textContent; el.textContent = "";
+  [...txt].forEach(c=>{
+    const s=document.createElement("span"); s.className="ch";
+    s.innerHTML = c===" " ? "&nbsp;" : c; el.appendChild(s);
+  });
+  return [...el.querySelectorAll(".ch")];
+}
+function splitWords(el){
+  const words = el.textContent.trim().split(/\s+/); el.innerHTML="";
+  words.forEach((w,wi)=>{
+    const ww=document.createElement("span"); ww.className="w";
+    [...w].forEach(c=>{ const s=document.createElement("span"); s.className="ch"; s.textContent=c; ww.appendChild(s); });
+    el.appendChild(ww);
+    if(wi<words.length-1) el.appendChild(document.createTextNode(" "));
+  });
+}
+function createScene(id, html){
+  const d=document.createElement("div"); d.className="scene"; d.id="scene-"+id;
+  d.innerHTML=`<div>${html}</div>`; stack.appendChild(d);
+  S.all.push(d); S.byId[id]=d; return d;
+}
+function createTextAnimation(){
+  createScene("opening", `<div class="kicker">ENTERING · <b>A QUIET SIGNAL</b></div><div class="rule"></div>
+    <h1 class="about" id="w-about">ABOUT</h1><h1 class="me" id="w-me">ME</h1>
+    <div class="sub" id="open-sub">A FILM IN TYPE · 75 SECONDS</div>`);
+  splitChars($("#w-about")); splitChars($("#w-me"));
+
+  createScene("design", `<div class="kicker">SC 02 — <b>I DESIGN</b></div><div class="rule"></div>
+    <h2 class="sentence" id="t-design-small">I DESIGN EXPERIENCES.</h2>
+    <h2 class="giant" id="t-design-giant">DESIGN</h2>
+    <div class="sub">WORD AS OBJECT · PUSH THROUGH</div>`);
+  splitWords($("#t-design-small")); splitChars($("#t-design-giant"));
+
+  createScene("architect", `<div class="kicker">SC 03 — <b>I ARCHITECT</b></div><div class="rule"></div>
+    <h2 class="sentence" id="t-arch-small">I ARCHITECT PRODUCTS.</h2>
+    <h2 class="giant vert-compress" id="t-arch-giant">ARCHITECT</h2>
+    <div class="sub">COMPRESSED → RELEASED</div>`);
+  splitWords($("#t-arch-small")); splitChars($("#t-arch-giant"));
+
+  createScene("connect", `<div class="kicker">SC 04 — <b>I CONNECT</b></div><div class="rule"></div>
+    <h2 class="giant" id="t-con-a">DESIGN</h2>
+    <h2 class="sentence serif-accent" id="t-con-plus">— + —</h2>
+    <h2 class="giant" id="t-con-b">ENGINEERING</h2>
+    <div class="sub">TWO WORDS · ONE COMPOSITION</div>`);
+  splitChars($("#t-con-a")); splitChars($("#t-con-b"));
+
+  createScene("ai", `<div class="kicker">SC 05 — <b>SIGNAL / NOISE</b></div><div class="rule"></div>
+    <h2 class="sentence" id="t-ai-frag">I EXPLORE AI-DRIVEN UX.</h2>
+    <h2 class="giant" id="t-ai-giant">AI</h2>
+    <h2 class="sentence" id="t-ai-full">AI-DRIVEN UX</h2>
+    <div class="sub">FRAGMENTS → MEANING</div>`);
+  splitWords($("#t-ai-frag")); splitChars($("#t-ai-giant")); splitWords($("#t-ai-full"));
+
+  createScene("build", `<div class="kicker">SC 06 — <b>I BUILD</b></div><div class="rule"></div>
+    <h2 class="sentence" id="t-b-small">I BUILD WITH</h2>
+    <h2 class="giant" id="t-b-giant">INTELLIGENCE</h2>
+    <div class="sub" id="t-b-sub">BEYOND THE EDGE · THEN REVEALED</div>`);
+  splitWords($("#t-b-small")); splitChars($("#t-b-giant"));
+
+  createScene("identity", `<div class="kicker">THE QUIET MOMENT — <b>IDENTITY REVEAL</b></div><div class="rule"></div>
+    <h2 class="identity-name" id="t-name">VENKATESH AMMIREDDY</h2>
+    <div class="roles" id="t-roles">
+      <span>UX CREATIVE DIRECTOR</span><span>PRODUCT UX ARCHITECT</span>
+      <span>DESIGN ENGINEER</span><span>AI + HUMAN-CENTERED PRODUCT INNOVATION</span>
+    </div>`);
+  splitChars($("#t-name"));
+
+  createScene("principles", `<div class="kicker">HOW I WORK — <b>THREE RULES</b></div><div class="rule"></div>
+    <h2 class="philo" id="t-pr-1">LISTEN FIRST.</h2>
+    <h2 class="philo" id="t-pr-2">PROTOTYPE FAST.</h2>
+    <h2 class="philo serif-accent" id="t-pr-3">ship with care.</h2>
+    <div class="sub">NO THEATRE · ONLY CRAFT</div>`);
+  ["#t-pr-1","#t-pr-2","#t-pr-3"].forEach(s=>splitWords($(s)));
+  createScene("open", `<div class="kicker">NOW — <b>AVAILABILITY</b></div><div class="rule"></div>
+    <h2 class="sentence" id="t-open-a">OPEN FOR</h2>
+    <h2 class="giant" id="t-open-b">SELECT WORK</h2>
+    <div class="sub">FOUNDERS · TEAMS · MOONSHOTS</div>`);
+  splitWords($("#t-open-a")); splitChars($("#t-open-b"));
+  createScene("philo", `<div class="kicker" id="ph-kicker">PHILOSOPHY — <b>01 / 04</b></div><div class="rule"></div>
+    <h2 class="philo" id="t-philo">CURIOUS BY NATURE.</h2>
+    <div class="sub">NOTHING ELSE ON SCREEN</div>`);
+  splitWords($("#t-philo"));
+
+  createScene("promise", `<div class="kicker">THE PROMISE — <b>YOU + ME</b></div><div class="rule"></div>
+    <h2 class="philo" id="t-pm-1">YOUR IDEA.</h2>
+    <h2 class="philo" id="t-pm-2">MY EXECUTION.</h2>
+    <h2 class="philo serif-accent" id="t-pm-3">I bring it to life.</h2>
+    <div class="sub">YOU DREAM IT · I BUILD IT</div>`);
+  ["#t-pm-1","#t-pm-2","#t-pm-3"].forEach(s=>splitWords($(s)));
+  createScene("final", `<div class="kicker">FINAL STATEMENT</div><div class="rule"></div>
+    <h2 class="cta" id="t-cta-a">LET'S CREATE</h2>
+    <h2 class="cta" id="t-cta-b">WHAT DOESN'T EXIST</h2>
+    <h2 class="cta serif-accent" id="t-cta-c">yet.</h2>`);
+  splitWords($("#t-cta-a")); splitWords($("#t-cta-b")); splitWords($("#t-cta-c"));
+
+  createScene("signoff", `<div class="small-name" id="t-sign">VENKATESH AMMIREDDY</div>`);
+  document.querySelectorAll(".ch").forEach(c=>c.dataset.orig=c.textContent);
+  S.all.forEach(n=>{ n.style.opacity=0; n.style.visibility="hidden"; });
+}
+
+/* single-visible controller — exactly one scene visible, scrub-safe */
+let currentScene = null;
+function transitionScene(node, opacity){
+  if(currentScene === node){
+    node.classList.add("active"); node.style.visibility="visible"; node.style.opacity=opacity;
+    return;
+  }
+  for(const n of S.all){
+    if(n===node){ n.classList.add("active"); n.style.visibility="visible"; n.style.opacity=opacity; }
+    else if(n.classList.contains("active") || n.style.visibility!=="hidden"){
+      n.classList.remove("active"); n.style.opacity=0; n.style.visibility="hidden";
+      n.style.transform="none"; n.style.filter="none";
+    }
+  }
+  currentScene = node;
+}
+
+/* =====================================================================
+   TYPOGRAPHY ENGINE — animateTypography()
+   modes: rise | separate | compress | merge | fragment | letter | quiet | expand
+===================================================================== */
+function animateTypography(chars, mode, lp, time){
+  const n = chars.length||1;
+  chars.forEach((ch,i)=>{
+    const stagger = mode==="letter" ? i*.09 : .5;
+    const t = clamp(lp*n - i*stagger, 0, 1.2);
+    const e = state.reduced ? clamp(t,0,1) : eo(clamp(t,0,1));
+    const sp = state.reduced ? e : spring(clamp(t,0,1));
+    let tr="", op=e, bl=0;
+    switch(mode){
+      case "separate": { // D E S I G N drifts apart then locks
+        const lock = eio(clamp((lp-.45)/.4,0,1));
+        const off = (i-n/2)*(1-lock)*34 + (1-e)*60;
+        tr=`translateX(${off.toFixed(1)}px) translateY(${(1-e)*-24}px)`;
+        bl=(1-e)*6; op=e; break; }
+      case "compress": // vertically squashed then expands
+        tr=`scaleY(${(0.18+0.82*e).toFixed(3)}) translateY(${(1-e)*30}px)`; bl=(1-e)*5; break;
+      case "merge":
+        tr=`translateY(${(1-e)*50}px)`; bl=(1-e)*6; break;
+      case "fragment": { // generated / resolving into readable
+        if(t<.55){ ch.textContent="01#/<>*+"[i%7]; tr=`translate(${(Math.sin(i*12.9)*14).toFixed(1)}px,${(Math.cos(i*7.7)*10).toFixed(1)}px)`; op=.45; bl=2; }
+        else { if(ch.textContent!==ch.dataset.orig) ch.textContent=ch.dataset.orig; tr=`scale(${(.7+.3*e).toFixed(3)})`; bl=(1-e)*5; }
+        break; }
+      case "letter": tr=`translateY(${(1-sp)*44}px)`; bl=(1-e)*7; break; // one at a time, physical
+      case "quiet": tr=`translateY(${(1-e)*26}px)`; bl=(1-e)*4; break;
+      case "expand": tr=`scale(${(.75+.25*e).toFixed(3)}) translateY(${(1-e)*26}px)`; bl=(1-e)*5; break;
+      default: tr=`translateY(${(1-e)*56}px)`; bl=(1-e)*7;
+    }
+    ch.style.transform=tr; ch.style.opacity=clamp(op,0,1);
+    ch.style.filter = bl>.25 ? `blur(${bl.toFixed(1)}px)` : "none";
+  });
+}
+
+/* =====================================================================
+   PARTICLE ATMOSPHERE — animateParticles()
+   Two depth layers, z-projection, warp on transitions, trails via alpha.
+   Rendered as soft light (radial sprites), not geometric shapes.
+===================================================================== */
+const backCv=$("#dust-back"), frontCv=$("#dust-front");
+const bctx=backCv.getContext("2d"), fctx=frontCv.getContext("2d");
+let Pback=[], Pfront=[];
+function makeParticles(list,count,depthMin,depthMax){
+  list.length=0;
+  for(let i=0;i<count;i++) list.push({
+    x:Math.random(), y:Math.random(), z:Math.random()*.85+.15,
+    vx:(Math.random()-.5)*.0006, vy:(Math.random()-.5)*.0005 - Math.random()*.0004,
+    ph:Math.random()*6.28, r:Math.random()*.9+.35,
+    gl:Math.random()<.3? GLYPHS[(Math.random()*GLYPHS.length)|0] : null // glyph dust
+  });
+}
+function sizeFilms(){
+  const dpr=Math.min(1.5, devicePixelRatio||1);
+  [[backCv,bctx],[frontCv,fctx]].forEach(([cv,ctx])=>{
+    cv.width=innerWidth*dpr; cv.height=innerHeight*dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  });
+  const q=QT[state.quality]||QT.high;
+  state.smokeSkip=state.mobile?Math.max(q.ss,3):q.ss; state.smokeOct=q.oct;
+  const nB = state.mobile?Math.min(q.pb,30):q.pb, nF = state.mobile?Math.min(q.pf,20):q.pf;
+  if(state.reduced){ makeParticles(Pback,14,.2,.6); makeParticles(Pfront,8,.5,1); }
+  else { makeParticles(Pback,nB,.15,.6); makeParticles(Pfront,nF,.5,1); }
+}
+function drawLayer(ctx,list,time,warp,inkLight,wide){
+  ctx.clearRect(0,0,innerWidth,innerHeight);
+  const W=innerWidth,H=innerHeight;
+  for(const p of list){
+    // drift + warp rushing toward camera (z grows, then wraps)
+    p.x+=p.vx + state.pointer.x*.0006*p.z;
+    p.y+=p.vy + state.pointer.y*.0004*p.z;
+    if(state.warp>.02 && !state.reduced) p.y-=state.warp*.006*p.z*(wide?2.2:1);
+    if(p.x<-.02)p.x+=1.04; if(p.x>1.02)p.x-=1.04;
+    if(p.y<-.02)p.y+=1.04; if(p.y>1.02)p.y-=1.04;
+    const tw = state.reduced ? .5 : .3+.55*Math.abs(Math.sin(time*.8+p.ph));
+    const proj = p.z*(1+state.warp*1.6);
+    const sx=p.x*W + Math.sin(time*.3+p.ph)*6*p.z + state.pointer.x*-14*p.z;
+    const sy=p.y*H + Math.cos(time*.26+p.ph)*6*p.z + state.pointer.y*-10*p.z;
+    const rad=(p.r*(0.7+proj*1.8))*(wide?1.7:1);
+    const stretch = 1+state.warp*7*p.z; // warp streaks vertically — light, not geometry
+    const alpha = tw*(0.10+proj*0.42)*(wide?0.8:1);
+    const col = inkLight ? "235,238,255" : "20,18,14";
+    if(p.gl){ // a drifting letter instead of a light mote — same field, typographic voice
+      ctx.font=`${Math.max(9,rad*7).toFixed(0)}px "JetBrains Mono",ui-monospace,monospace`;
+      ctx.fillStyle=`rgba(${col},${clamp(alpha*1.5,.05,.8).toFixed(3)})`;
+      ctx.fillText(p.gl,sx,sy);
+    } else {
+      const g=ctx.createRadialGradient(sx,sy,0,sx,sy,rad*3);
+      g.addColorStop(0,`rgba(${col},${alpha.toFixed(3)})`);
+      g.addColorStop(1,`rgba(${col},0)`);
+      ctx.fillStyle=g;
+      ctx.beginPath();
+      ctx.ellipse(sx,sy,rad*1.2,rad*(1.1+ (state.reduced?0:state.warp*6*p.z)),0,0,6.283);
+      ctx.fill();
+    }
+    void stretch;
+  }
+}
+function animateParticles(time, inkLight){
+  drawLayer(bctx,Pback,time,state.warp,inkLight,false);
+  drawLayer(fctx,Pfront,time,state.warp,inkLight,true);
+}
+function aiRain(time){ // rising character rain behind the AI generation phase — type as weather
+  const n=state.mobile?16:34;
+  fctx.save();
+  fctx.font='11px "JetBrains Mono",ui-monospace,monospace';
+  fctx.textAlign='center';
+  for(let i=0;i<n;i++){
+    const px=((i*97.3)%100)/100*innerWidth+Math.sin(time*.7+i)*8;
+    const py=((time*34*(0.4+(i%5)*.18)+i*251)%(innerHeight+40))-20;
+    const a=.1+.24*Math.abs(Math.sin(time+i*2.1));
+    fctx.fillStyle=i%3? `rgba(0,229,255,${a.toFixed(2)})` : `rgba(255,0,153,${a.toFixed(2)})`;
+    fctx.fillText("01アイUX+×"[i%8],px,py);
+  }
+  fctx.restore();
+}
+
+/* =====================================================================
+   RADIUM AIR — colorful liquid-smoke atmosphere on the deepest layer.
+   Domain-warped noise advected like real air (slow rise + swaying
+   breeze + traveling wave bands), rendered per-pixel into a tiny
+   buffer, upscaled + heavily blurred so it reads as tinted air,
+   never as geometry. Vivid radium gradient rooted in the live grade.
+===================================================================== */
+let RADIUM=[[124,58,237],[255,0,153],[34,211,238],[190,242,100]]; // living radium stops
+let RADIUM_T=RADIUM.map(r=>r.slice()), smokeNextRoll=0;
+function hsl2rgb(h,s,l){
+  h=((h%360)+360)%360; s=clamp(s,0,1); l=clamp(l,0,1);
+  const c=(1-Math.abs(2*l-1))*s, hp=h/60, x=c*(1-Math.abs(hp%2-1));
+  let r=0,g=0,b=0;
+  if(hp<1){r=c;g=x;}else if(hp<2){r=x;g=c;}else if(hp<3){g=c;b=x;}else if(hp<4){g=x;b=c;}else if(hp<5){r=x;b=c;}else{r=c;b=x;}
+  const m=l-c/2;
+  return [(r+m)*255,(g+m)*255,(b+m)*255];
+}
+function rollRadium(){ // re-roll vivid target hues — spread apart so the gradient stays rainbow, never muddy
+  const base=Math.random()*360, spread=[0,70,150,225];
+  for(let s=0;s<4;s++) RADIUM_T[s]=hsl2rgb(base+spread[s]+(Math.random()*36-18), .9+Math.random()*.1, .55+Math.random()*.1);
+}
+const smokeCv=$("#smoke"), smokeCtx=smokeCv.getContext("2d");
+const SMOKE_W = 160, SMOKE_H = 90;
+let smokeImg=null, smokeT=Math.random()*100, smokeLastWall=0, smokeTick=0, smokeOp=.45;
+const smokePal={ bg:[5,5,6], ac:[244,241,234], ink:[244,241,234] }; // smoothed live palette
+const smokePerm=new Uint8Array(512);
+(function seedSmoke(){
+  let s=1234567;
+  const rnd=()=> (s=(s*1664525+1013904223)>>>0)/4294967296;
+  const p=[...Array(256).keys()];
+  for(let i=255;i>0;i--){ const j=(rnd()*(i+1))|0; [p[i],p[j]]=[p[j],p[i]]; }
+  for(let i=0;i<512;i++) smokePerm[i]=p[i&255];
+})();
+function smokeNoise(x,y){
+  const xi=Math.floor(x), yi=Math.floor(y);
+  const xf=x-xi, yf=y-yi;
+  const u=xf*xf*(3-2*xf), v=yf*yf*(3-2*yf);
+  const h=(X,Y)=>smokePerm[(smokePerm[X&255]+Y)&255]/255;
+  return lerp(lerp(h(xi,yi),h(xi+1,yi),u), lerp(h(xi,yi+1),h(xi+1,yi+1),u), v);
+}
+function smokeFbm(x,y,oct){
+  let a=0, amp=.5, f=1;
+  for(let i=0;i<oct;i++){ a+=amp*smokeNoise(x*f,y*f); f*=2.03; amp*=.5; }
+  return a; // ~0..1
+}
+function initSmoke(){
+  smokeCv.width=SMOKE_W; smokeCv.height=SMOKE_H;
+  smokeImg=smokeCtx.createImageData(SMOKE_W,SMOKE_H);
+  // first paint so the film never opens on a blank field
+  for(let i=0;i<6;i++) animateSmoke(0,i*.05,{bg:"rgb(5,5,6)",ac:"rgb(244,241,234)",ink:"rgb(244,241,234)",dark:true},true);
+}
+function smokeTargetFor(scene){
+  // per-scene smoke presence — quiet identity barely breathes, AI surges
+  switch(scene){
+    case "ai": return .85;
+    case "build": return .6;
+    case "final": return .6;
+    case "connect": return .55;
+    case "design": case "architect": return .5;
+    case "opening": return .45;
+    case "signoff": return .4;
+    case "philo": return .3;
+    case "identity": return .22;
+    case "promise": return .55;
+    default: return .45;
+  }
+}
+function animateSmoke(sec, time, colors, force){
+  if(!smokeImg) return;
+  if(state.reduced && !force){ // reduced motion: one near-static veil, barely evolving
+    if((smokeTick++%24)!==0 && !force) return;
+  } else if(!force){
+    if((smokeTick++%state.smokeSkip)!==0) return; // stride set by adaptive quality
+  }
+  const wallDelta=smokeLastWall? Math.min(.1,time-smokeLastWall) : .016;
+  smokeLastWall=time;
+  const energy=state.reduced? .02 : (.05+state.warp*.4);
+  smokeT+=wallDelta*energy*(state.playing?1:.3);
+  // ever-changing radium: fresh random hues every few seconds, eased so color flows
+  if(!state.reduced && time>=smokeNextRoll){ rollRadium(); smokeNextRoll=time+4+Math.random()*5; }
+  for(let s=0;s<4;s++) for(let i=0;i<3;i++) RADIUM[s][i]=lerp(RADIUM[s][i],RADIUM_T[s][i],.04);
+  // ease live palette toward the scene grade — no color pops on cuts
+  const tb=parseRGB(colors.bg), ta=parseRGB(colors.ac), ti=parseRGB(colors.ink);
+  for(let i=0;i<3;i++){
+    smokePal.bg[i]=lerp(smokePal.bg[i],tb[i],.06);
+    smokePal.ac[i]=lerp(smokePal.ac[i],ta[i],.06);
+    smokePal.ink[i]=lerp(smokePal.ink[i],ti[i],.06);
+  }
+  const oct=state.smokeOct||3;
+  const t=smokeT, d=smokeImg.data;
+  const deep=[smokePal.bg[0]*.4,smokePal.bg[1]*.4,smokePal.bg[2]*.45];
+  const base=smokePal.bg, ink=smokePal.ink;
+  const sstep=(a,b,x)=>{ const u=clamp((x-a)/(b-a),0,1); return u*u*(3-2*u); };
+  let k=0;
+  for(let y=0;y<SMOKE_H;y++){
+    const ny=y/SMOKE_H*3;
+    for(let x=0;x<SMOKE_W;x++,k+=4){
+      const nx=x/SMOKE_W*3;
+      // air current: slow rise like warm air + breeze swaying with height
+      const qx=smokeFbm(nx+t*.2, ny-t*.15, oct);
+      const qy=smokeFbm(nx-t*.17+5.2, ny+t*.19+1.3, oct);
+      const ax=nx+Math.sin(ny*1.3+t*.32)*.38+t*.05+1.7*(qx-.5);
+      const ay=ny-t*.3+1.7*(qy-.5);
+      let v=smokeFbm(ax,ay,oct);
+      v+=.12*Math.sin(nx*2.2+t*.85+2.4*qx)*Math.sin(ny*1.8-t*.65); // traveling air-wave bands
+      v+=.06*Math.sin(t*.23);                                      // slow color breathing
+      v=clamp(v,0,1);
+      // radium gradient walk: deep → grade → violet → magenta → cyan → lime → ink
+      let r=deep[0], g=deep[1], b=deep[2];
+      const mixTo=(c,s)=>{ r+=(c[0]-r)*s; g+=(c[1]-g)*s; b+=(c[2]-b)*s; };
+      mixTo(base,sstep(.12,.42,v));
+      mixTo(RADIUM[0],sstep(.42,.58,v));
+      mixTo(RADIUM[1],sstep(.58,.7,v));
+      mixTo(RADIUM[2],sstep(.7,.82,v));
+      mixTo(RADIUM[3],sstep(.82,.92,v)*.85);
+      mixTo(ink,sstep(.93,1,v)*.5);
+      d[k]=r; d[k+1]=g; d[k+2]=b; d[k+3]=255;
+    }
+  }
+  smokeCtx.putImageData(smokeImg,0,0);
+  // presence follows scene + warp surge, smoothed so smoke breathes rather than blinks
+  const target=smokeTargetFor(sceneAt(sec).scene)*(0.75+state.warp*.5);
+  smokeOp=lerp(smokeOp,clamp(target,0,.85),.05);
+  document.documentElement.style.setProperty("--smoke-op",smokeOp.toFixed(3));
+}
+
+/* =====================================================================
+   CAMERA — animateCamera() : continuous, intentional, multi-depth
+===================================================================== */
+const cameraEl=$("#camera"), stageEl=$("#stage"), atmoWord=$("#atmo-word");
+/* keyframes: [sec, scale, x, y, rot] — purposeful dolly, never random */
+const CAM_KEYS=[
+  [0,   1.9, 0, 26, 0], [2.5, 1.25, 0, 8, 0], [4, 1.0, 0, 0, 0],
+  [6,   1.35, 0, 0, 0], [8.2, 3.4, 0, 0, 0],  [9, 1.0, 0, 0, 0],   // push THROUGH design
+  [11,  1.2, 0, 0, -1.4],[13.2, 0.72, 0, 0, 1.2],[14, 1.0, 0, 0, 0], // rotate + pull back
+  [16,  1.15, -26, 6, 0],[18.4, 1.15, 26, -6, 0],[19.2, 3.2, 0, 0, 0],[20, 1.0, 0, 0, 0], // whip + rush
+  [22,  1.1, 0, 6, 0],[25, 1.7, 0, 0, 0],[26.2, 0.9, 0, 0, 0],[27, 1.0, 0, 0, 0], // approach AI
+  [29,  1.05, 0, 4, 0],[31.5, 2.6, 0, 0, 0],[33, 0.62, 0, 0, 0],   // expand beyond edges → pull back
+  [36,  0.9, 0, 6, 0],[40, 0.96, 0, 4, 0],[42, 1.0, 0, 4, 0],      // identity: near stillness
+  [44.2, 1.06, 0, 2, 0],[46.5, 1.0, 0, 3, 0],                     // principles: slow lean-in
+  [49,  1.02, 0, 3, 0],[53, 1.0, 0, 3, 0],[55, 1.0, 0, 0, 0],     // philosophy: near stillness
+  [57.5, 1.16, 0, 0, 0],[60, 1.0, 0, 0, 0],                       // open: gentle lift, settle
+  [62.5, 1.18, 0, 0, 0],[65, 1.0, 0, 0, 0],                       // promise: ember push, settle
+  [67.5, 1.25, 0, 0, 0],[71.5, 2.4, 0, -4, 0],[73, 1.0, 0, 0, 0], // final: rise into push-through
+  [75, 1.0, 0, 6, 0],
+];
+function animateCamera(sec, time){
+  let a=CAM_KEYS[0], b=CAM_KEYS.at(-1);
+  for(let i=0;i<CAM_KEYS.length-1;i++) if(sec>=CAM_KEYS[i][0]&&sec<=CAM_KEYS[i+1][0]){a=CAM_KEYS[i];b=CAM_KEYS[i+1];break;}
+  const lt=seg(sec,a[0],b[0]), e=lt*lt*(3-2*lt);
+  const amp = state.reduced?0.15:(state.mobile?0.45:1);
+  let s=lerp(a[1],b[1],e), x=lerp(a[2],b[2],e)*amp, y=lerp(a[3],b[3],e)*amp, r=lerp(a[4],b[4],e)*(state.reduced?0:1);
+  // seamless-loop seam: ease camera toward the opening key across 58.6→60→0.6 so the wrap has no pop
+  const seam=seg(sec,73.6,75);
+  if(seam>0 && !state.reduced){
+    s=lerp(s,CAM_KEYS[0][1],seam*.85); x=lerp(x,CAM_KEYS[0][2],seam*.85); y=lerp(y,14,seam*.6); r=lerp(r,0,seam);
+  }
+  state.punch=lerp(state.punch||0,0,.1); state.dutch=lerp(state.dutch||0,0,.08); // crash-zoom decay
+  if(!state.reduced){ s*=1+state.punch*.22; r+=state.dutch*1.8; }
+  x+=state.pointer.x*24*amp; y+=state.pointer.y*18*amp; r+=state.pointer.x*1.1*(state.reduced?0:1);
+  if(!state.reduced){
+    x+=Math.sin(time*.4)*5*amp; y+=Math.cos(time*.33)*5*amp;
+    // handheld micro-jitter: present in kinetic acts, locked-off when quiet (identity/philosophy)
+    const quiet=(sec>33&&sec<42)||(sec>42&&sec<52)?0:1;
+    const j=quiet*(0.6+state.warp*2.2);
+    x+=Math.sin(time*7.3)*j*amp; y+=Math.cos(time*6.1)*j*amp; r+=Math.sin(time*5.2)*j*.06;
+  }
+  // camera velocity → drives motion blur + warp coupling (no random movement)
+  const pv=state.camPrev;
+  const inst=Math.abs(s-pv.scale)*2.2+Math.abs(x-pv.x)*.012+Math.abs(y-pv.y)*.012;
+  state.camVel=lerp(state.camVel||0,clamp(inst,0,1),.1);
+  state.camPrev={scale:s,x,y};
+  state.cam={scale:s,x,y,rot:r};
+  cameraEl.style.transform=`translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,0) scale(${s.toFixed(4)}) rotate(${r.toFixed(2)}deg)`;
+  document.querySelectorAll(".layer").forEach(L=>{
+    const d=parseFloat(L.dataset.depth||.4);
+    L.style.translate=`${(-state.pointer.x*20*d*amp).toFixed(1)}px ${(-state.pointer.y*14*d*amp).toFixed(1)}px`;
+  });
+  // faint editorial ghost word drifts opposite — depth cue, pure type
+  atmoWord.style.transform=`translate(${( -x*.5-state.pointer.x*26).toFixed(1)}px,${(-y*.5).toFixed(1)}px)`;
+  return state.cam;
+}
+
+/* =====================================================================
+   COLOUR — transitionColor()
+===================================================================== */
+function parseRGB(str){
+  const m=str.match(/[\d.]+/g); return m? [parseFloat(m[0]),parseFloat(m[1]),parseFloat(m[2])] : [0,0,0];
+}
+function transitionColor(sec){
+  const {cur,prev,blend}=gradeAt(sec);
+  const bg=hexLerp(prev.bg,cur.bg,blend), ink=hexLerp(prev.ink,cur.ink,blend), ac=hexLerp(prev.accent,cur.accent,blend);
+  const root=document.documentElement.style;
+  root.setProperty("--bg",bg); root.setProperty("--ink",ink);
+  root.setProperty("--accent",ac);
+  stageEl.style.backgroundColor=bg;
+  stageEl.style.color=ink; // propagate real ink so SVG currentColor + labels inherit correctly on every blend
+  const svg=$("#connect-svg"); if(svg) svg.style.color=ink;
+  // luminance of the ACTUAL blended background — never flips early like the old cur.bg check
+  const [br,bgc,bb]=parseRGB(bg);
+  const lum=(0.2126*br+0.7152*bgc+0.0722*bb)/255;
+  const dark=lum<0.5;
+  $("#atmo-glow").style.setProperty("--glow",cur.glow);
+  root.setProperty("--muted", dark?"rgba(244,241,234,.78)":"rgba(16,16,20,.66)");
+  root.setProperty("--type-glow", dark
+    ? "0 0 14px rgba(0,0,0,.8), 0 2px 8px rgba(0,0,0,.65)" // light text: depth shadow, never white bloom
+    : "0 1px 2px rgba(255,255,255,.6), 0 0 24px rgba(255,255,255,.4)"); // dark text: lifted halo
+  root.setProperty("--edge", dark?"rgba(255,246,235,.78)":"rgba(255,255,255,.92)");
+  root.setProperty("--accent-glow", dark? cur.glow : "transparent");
+  root.setProperty("--scrim", dark?"rgba(0,0,0,.42)":"rgba(255,255,255,.42)");
+  root.setProperty("--scrim-op", (0.55+blend*0.45).toFixed(2)); // stronger scrim mid-transition when contrast is weakest
+  atmoWord.style.color=ink; atmoWord.textContent=cur.word;
+  $("#ch-name").textContent=sceneAt(sec).label;
+  const idx=CONFIG.timeline.indexOf(sceneAt(sec));
+  $("#ch-num").textContent=`SC ${String(idx+1).padStart(2,"0")} / ${CONFIG.timeline.length}`;
+  return {bg,ink,ac,dark};
+}
+
+/* =====================================================================
+   TIMELINE DRIVER — playTimeline loop target; one deterministic pass
+===================================================================== */
+const spotEl=$("#spot");
+const fadeBlack=$("#fade-black"), connPath=$("#connect-path"), aiPath=$("#ai-path"),
+      distMap=$("#dist-map"), distTurb=$("#dist-turb"),
+      exposureEl=$("#exposure"), anamorphicEl=$("#anamorphic"), actCard=$("#act-card"), actName=$("#act-name");
+/* CINEMATIC STYLE — exposure, lens flare, rack focus, flicker, act burn-ins.
+   All light / focus / type phenomena. No geometric objects. */
+function cinematicStyle(sec, time, dark){
+  if(state.reduced) return;
+  // 1) exposure flash on hard cuts — a photographic blink, not a shape
+  const cuts=[8.6,14.0,19.4,26.3,32.6,55.2,60.4,65.4,72.2];
+  let flash=0;
+  for(const c of cuts){ flash=Math.max(flash, 1-Math.abs(sec-c)/0.28); }
+  flash=clamp(flash,0,1);
+  if(exposureEl) exposureEl.style.opacity=(flash*flash*0.30).toFixed(3);
+  // 2) anamorphic-style lens flare follows warp energy (light artifact)
+  if(anamorphicEl) anamorphicEl.style.opacity=(clamp(state.warp,0,1)*0.55).toFixed(3);
+  // 3) rack focus — focus breathes between type and atmosphere per act
+  const quiet=(sec>33&&sec<52)?1:0;
+  const backBlur=(1.2+quiet*1.4-state.warp*1.2).toFixed(1);
+  const frontBlur=(0.6+state.warp*1.6).toFixed(1);
+  if(state.quality!=="low"){ // rack focus is a luxury — dropped first on weak devices
+    backCv.style.filter=`blur(${clamp(backBlur,0,3)}px)`;
+    frontCv.style.filter=`blur(${clamp(frontBlur,0,3)}px)`;
+  } else { backCv.style.filter="none"; frontCv.style.filter="none"; }
+  // 4) projector flicker + shutter punch + bleach-bypass blink — whisper-subtle, skip when quiet
+  const flick=Math.sin(time*47)*0.004+Math.sin(time*31.7)*0.003;
+  const punch=1+flash*0.05;
+  stageEl.style.filter=`brightness(${(punch+flick*(quiet?0.3:1)).toFixed(4)}) contrast(${(1+flash*.12).toFixed(4)}) saturate(${state.reduced?1:(1-flash*.4).toFixed(3)})`;
+  // 5) act burn-in — typographic chapter whisper, never fights the main type
+  const acts=[[0,14,"ACT I — CRAFT"],[14,33,"ACT II — SIGNAL"],[33,76,"ACT III — HUMAN"]];
+  let cur=acts[0][2], op=0;
+  for(const [a,b,label] of acts){
+    if(sec>=a&&sec<b){
+      cur=label;
+      op=Math.max(seg(sec,a,a+1.6)*(1-seg(sec,a+2.6,a+4.2)), seg(sec,b-1.2,b)*0.0);
+      if(sec>a+4.2&&sec<b-2) op=0.55; // faint persistent burn-in mid-act
+      else if(sec>=b-2) op=lerp(op,0.55,.5);
+    }
+  }
+  if(actName&&actName.textContent!==cur) actName.textContent=cur;
+  if(actCard) actCard.style.opacity=clamp(op,0,0.8).toFixed(2);
+}
+function orbitPalette(dark,ac,ink){ // behavior basis: warm spark + dark depth on dark film, accent-fire on light
+  const c=dark?[255,248,238]:parseRGB(ac), h=dark?[0,0,0]:parseRGB(ink);
+  const r=v=>Math.round(clamp(v,0,255));
+  return { core:`rgba(${r(c[0])},${r(c[1])},${r(c[2])},${dark?".9":".95"})`,
+           halo:`rgba(${r(h[0])},${r(h[1])},${r(h[2])},${dark?".55":".28"})` };
+}
+function driveTimeline(sec, time){
+  const {bg,ink,ac,dark}=transitionColor(sec);
+  animateCamera(sec,time);
+  // warp energy peaks on hard transitions, silence in identity; coupled with camera velocity
+  const edges=[[8.0,9.2],[13.6,14.4],[18.6,20.2],[25.4,27.2],[31.8,33.4],[54.6,56],[59.6,60.8],[64.6,65.8],[71.2,73]];
+  let w=0; for(const [a,b] of edges){ w=Math.max(w, seg(sec,a,(a+b)/2)*(1-seg(sec,(a+b)/2,b))); }
+  if(sec>33&&sec<42) w*=0.12; // identity: particles almost stop
+  if(sec>52&&sec<56) w*=0.5;
+  w=Math.max(w,(state.camVel||0)*.8); // fast dolly adds a whisper of warp
+  state.warp = state.reduced?0:lerp(state.warp,w,.08);
+  animateParticles(time,dark);
+  animateSmoke(sec,time,{bg,ac,ink,dark});
+  // living atmosphere: breathing glow + animated type distortion (typography-only SVG use)
+  const glow=$("#atmo-glow");
+  if(glow && !state.reduced) glow.style.opacity=(0.75+0.25*Math.sin(time*.7)+state.warp*.2).toFixed(2);
+  if(distTurb && !state.reduced) distTurb.setAttribute("baseFrequency",`0.012 ${(0.09+state.warp*.06+Math.sin(time*.9)*.008).toFixed(3)}`);
+
+  const sc=sceneAt(sec).scene;
+  const show=(id,op=1)=>transitionScene(S.byId[id],op);
+  const applyDist=(amt)=>{ distMap.setAttribute("scale",state.reduced?0:amt.toFixed(1)); };
+  applyDist(state.warp*60);
+  state.shock=lerp(state.shock||0,0,.09);
+  if(!state.reduced && state.shock>.03 && currentScene){ // shockwave: energy ripples across the word
+    state.shockWas=true;
+    const chars=currentScene.querySelectorAll(".ch"), n=chars.length||1;
+    const front=1-state.shock, amp=state.mobile?.5:1;
+    chars.forEach((c,i)=>{
+      const d=Math.sin((i/n)*5.2-front*9);
+      c.style.textShadow=d>0? `0 0 ${(d*state.shock*26*amp).toFixed(0)}px var(--accent)` : "";
+    });
+  } else if(currentScene && state.shockWas){
+    state.shockWas=false;
+    currentScene.querySelectorAll(".ch").forEach(c=>{ if(c.style.textShadow) c.style.textShadow=""; });
+  }
+  // vignette breathes with warp energy
+  const vig=$("#vignette");
+  if(vig) vig.style.opacity=(0.85+state.warp*.6+Math.sin(time*.5)*.05).toFixed(2);
+  cinematicStyle(sec, time, dark);
+
+  /* ---- SCENE 01 : ABOUT ME — far → faint → sharp → approach ---- */
+  if(sc==="opening"){
+    show("opening",1);
+    const tA=seg(sec,.6,2.2), tM=seg(sec,1.8,3.0), thru=seg(sec,3.2,4.0);
+    animateTypography([...document.querySelectorAll("#w-about .ch")],"separate",clamp(tA*1.2,0,1.15),time);
+    [...document.querySelectorAll("#w-about .ch")].forEach(c=>{ if(tA<=0)c.style.opacity=0.06; });
+    if(tA>.12) [...document.querySelectorAll("#w-about .ch")].forEach(c=>{ if(parseFloat(c.style.opacity)<.12)c.style.opacity=.14; });
+    animateTypography([...document.querySelectorAll("#w-me .ch")],"expand",tM,time);
+    $("#open-sub").style.opacity=seg(sec,2.4,3.2)*(1-thru);
+    S.byId.opening.style.filter=thru>0?`blur(${(thru*14).toFixed(1)}px)`:"none";
+    S.byId.opening.style.transform=thru>0?`scale(${(1+thru*1.8).toFixed(3)})`:"none";
+    fadeBlack.style.opacity=Math.max(seg(sec,3.7,4.0)*.9, 1-seg(sec,0,0.9)); // loop entry: rise from black
+    connPath.setAttribute("opacity",0); aiPath.setAttribute("opacity",0);
+    return;
+  }
+  fadeBlack.style.opacity=0;
+
+  /* ---- SCENE 02 : I DESIGN EXPERIENCES. — word-by-word, DESIGN huge, push through ---- */
+  if(sc==="design"){
+    const lp=seg(sec,4,9);
+    fadeBlack.style.opacity=(1-seg(sec,4,4.5))*.9; // fade from black — own transition language
+    show("design",1);
+    const small=[...document.querySelectorAll("#t-design-small .ch")];
+    const giant=[...document.querySelectorAll("#t-design-giant .ch")];
+    if(lp<.42){ // sentence word-by-word
+      $("#t-design-small").style.display=""; $("#t-design-giant").style.display="none";
+      animateTypography(small,"rise",clamp(lp/.42*1.15,0,1.2),time);
+      small.forEach(c=>{ if(c.style.translate) c.style.translate=""; });
+    } else { // DESIGN extremely large, camera moves through, fills screen
+      $("#t-design-small").style.display="none"; $("#t-design-giant").style.display="";
+      const g=seg(sec,6.2,8.4);
+      const cg=1-eo(clamp(g/.32,0,1)); // converge: letters fly in from the air, then lock
+      const scatter=i=>cg>.01? `${((i-2.5)*260*cg).toFixed(0)}px ${(((i%2)*2-1)*170*cg).toFixed(0)}px` : "";
+      giant.forEach((c,i)=>{
+        if(i===1||i===3){ // E S separate then lock — physical letters
+          const lock=eio(clamp((g-.3)/.5,0,1));
+          c.style.transform=`translateX(${(1-lock)*(i===1?-160:160)}px) scale(${(.6+.4*eo(clamp(g*1.4-i*.1,0,1))).toFixed(3)})`;
+          c.style.opacity=eo(clamp(g*1.4-i*.1,0,1)); c.style.filter=`blur(${((1-eo(clamp(g*1.4-i*.1,0,1)))*8).toFixed(1)}px)`;
+          c.style.translate=scatter(i);
+        } else { animateTypography([c],"expand",g,time); c.style.translate=scatter(i); }
+      });
+      const thru2=seg(sec,8.2,9.0);
+      S.byId.design.style.transform=`scale(${(1+thru2*2.2).toFixed(3)})`;
+      S.byId.design.style.filter=thru2>0?`blur(${(thru2*16).toFixed(1)}px)`:"none";
+      fadeBlack.style.opacity=thru2*.95;
+    }
+    return;
+  }
+
+  /* ---- SCENE 03 : I ARCHITECT PRODUCTS. — depths, compressed → expands, rotate back ---- */
+  if(sc==="architect"){
+    const lp=seg(sec,9,14);
+    fadeBlack.style.opacity=(1-seg(sec,9,9.5))*.9;
+    show("architect",1);
+    S.byId.architect.style.transform="none"; S.byId.architect.style.filter="none";
+    if(lp<.45){
+      $("#t-arch-small").style.display=""; $("#t-arch-giant").style.display="none";
+      const ch=[...document.querySelectorAll("#t-arch-small .ch")];
+      ch.forEach((c,i)=>{ // enter from different depths
+        const d=i%3, e=eo(clamp(lp/.45*1.3-i*.06,0,1));
+        const z=(d===0?-160:(d===1?0:160))*(1-e);
+        c.style.transform=`translateZ(${z.toFixed(0)}px) translateY(${((1-e)*60).toFixed(0)}px)`;
+        c.style.opacity=e; c.style.filter=`blur(${((1-e)*9).toFixed(1)}px)`;
+      });
+    } else {
+      $("#t-arch-small").style.display="none"; $("#t-arch-giant").style.display="";
+      const g=seg(sec,11,13.4);
+      [...document.querySelectorAll("#t-arch-giant .ch")].forEach((c,i)=>{
+        const e=eo(clamp(g*1.3-i*.05,0,1));
+        const squash=(1-eio(clamp((g-.35)/.45,0,1)))*.82; // compressed then dramatic release
+        c.style.transform=`scaleY(${(0.18+squash*0+0.82*e).toFixed(3)}) scaleX(${((1.6-0.6*e)).toFixed(3)}) translateY(${((1-e)*40).toFixed(0)}px)`;
+        c.style.opacity=e; c.style.filter=`blur(${((1-e)*7).toFixed(1)}px)`;
+        c.style.letterSpacing=`${((1-eio(clamp((g-.35)/.45,0,1)))*.3).toFixed(2)}em`;
+      });
+      S.byId.architect.style.filter=`blur(${(seg(sec,13.4,14)*8).toFixed(1)}px)`;
+    }
+    return;
+  }
+
+  /* ---- SCENE 04 : CONNECT — DESIGN first, ENGINEERING later, merge, rush through ---- */
+  if(sc==="connect"){
+    const lp=seg(sec,14,20);
+    show("connect",1);
+    const A=[...document.querySelectorAll("#t-con-a .ch")], B=[...document.querySelectorAll("#t-con-b .ch")];
+    const tA=seg(sec,14.2,16), tB=seg(sec,15.8,17.6), merge=seg(sec,17.2,18.8), thru=seg(sec,18.8,20);
+    animateTypography(A,"merge",clamp(tA*1.2,0,1.2),time);
+    B.forEach(c=>c.style.opacity=0);
+    if(tB>0) animateTypography(B,"merge",clamp(tB*1.2,0,1.2),time);
+    if(merge>0){ // words move toward each other into one composition
+      const m=eio(merge);
+      $("#t-con-a").style.transform=`translateY(${(m*44).toFixed(0)}px) scale(${(.9+.1*m).toFixed(3)})`;
+      $("#t-con-b").style.transform=`translateY(${(-m*44).toFixed(0)}px) scale(${(.9+.1*m).toFixed(3)})`;
+      $("#t-con-plus").style.opacity=m; $("#t-con-plus").style.filter=`blur(${((1-m)*6).toFixed(1)}px)`;
+      connPath.setAttribute("opacity",(m*.8).toFixed(2)); // subtle typographic connection
+      connPath.style.strokeDashoffset=state.reduced?0:(-time*30);
+    } else { connPath.setAttribute("opacity",0); $("#t-con-plus").style.opacity=0; }
+    S.byId.connect.style.transform=thru>0?`translateX(${(-thru*90).toFixed(0)}px) skewX(${(-thru*6).toFixed(1)}deg) scale(${(1+thru*2.4).toFixed(2)})`:"none"; // camera whip + push
+    S.byId.connect.style.filter=thru>0?`blur(${(thru*10).toFixed(1)}px)`:"none";
+    fadeBlack.style.opacity=seg(sec,19.6,20)*.9;
+    return;
+  }
+  connPath.setAttribute("opacity",0);
+
+  /* ---- SCENE 05 : AI — fragmented generation → AI huge → AI-DRIVEN UX ---- */
+  if(sc==="ai"){
+    const lp=seg(sec,20,27);
+    fadeBlack.style.opacity=(1-seg(sec,20,20.6))*.95;
+    show("ai",1);
+    S.byId.ai.style.transform="none"; S.byId.ai.style.filter="none";
+    const frag=[...document.querySelectorAll("#t-ai-frag .ch")],
+          giant=[...document.querySelectorAll("#t-ai-giant .ch")],
+          full=[...document.querySelectorAll("#t-ai-full .ch")];
+    if(lp<.4){
+      $("#t-ai-frag").style.display=""; $("#t-ai-giant").style.display="none"; $("#t-ai-full").style.display="none";
+      animateTypography(frag,"fragment",clamp(lp/.4*1.2,0,1.2),time);
+      if(!state.reduced) aiRain(time);
+      aiPath.setAttribute("opacity",.25);
+    } else if(lp<.78){
+      $("#t-ai-frag").style.display="none"; $("#t-ai-giant").style.display=""; $("#t-ai-full").style.display="none";
+      animateTypography(giant,"expand",clamp((lp-.4)/.38*1.2,0,1.2),time); // AI extremely large, particles accelerate
+      $("#t-ai-giant").style.textShadow=`0 0 ${(state.warp*60).toFixed(0)}px ${ink}`;
+      aiPath.setAttribute("opacity",.6); aiPath.style.strokeDashoffset=state.reduced?0:(-time*60);
+    } else {
+      $("#t-ai-frag").style.display="none"; $("#t-ai-giant").style.display="none"; $("#t-ai-full").style.display="";
+      animateTypography(full,"rise",clamp((lp-.78)/.22*1.25,0,1.25),time);
+      aiPath.setAttribute("opacity",.3);
+    }
+    if(seg(sec,26.4,27)>0) fadeBlack.style.opacity=seg(sec,26.4,27);
+    return;
+  }
+  aiPath.setAttribute("opacity",0);
+
+  /* ---- SCENE 06 : BUILD — foundation line, machinery slam, over-expand, reveal ---- */
+  if(sc==="build"){
+    const lp=seg(sec,27,33);
+    fadeBlack.style.opacity=(1-seg(sec,27,27.5))*.9;
+    show("build",1);
+    // foundation: words lay down one after another, tracking settles like set type
+    const small=[...document.querySelectorAll("#t-b-small .ch")];
+    animateTypography(small,"letter",clamp(lp/.32*1.1,0,1.1),time);
+    $("#t-b-small").style.letterSpacing=`${((1-eo(clamp(lp/.32,0,1)))*.35).toFixed(2)}em`;
+    const g=[...document.querySelectorAll("#t-b-giant .ch")];
+    const n=g.length||1;
+    const tG=seg(sec,28.2,30.4), hold=seg(sec,30.4,31.5), pull=seg(sec,31.5,33);
+    const bsub=$("#t-b-sub");
+    const setSub=t=>{ if(bsub&&bsub.dataset.v!==t){ bsub.dataset.v=t; bsub.textContent=t; } };
+    if(hold<=0&&pull<=0){ // monumental ascent: one rising wall, wave stagger, landing flash
+      let landed=0;
+      g.forEach((c,i)=>{
+        const p=clamp(tG*1.5-i*.07,0,1);
+        if(p>=1) landed++;
+        const e=state.reduced? clamp(tG*1.4-i*.09,0,1) : spring(p);
+        const drop=1-eo(p);
+        c.style.transform=`translateY(${(drop*90).toFixed(0)}px) scale(${clamp(e,.01,1.12).toFixed(3)})`;
+        c.style.opacity=clamp(e,0,1);
+        c.style.filter=drop>.03?`blur(${(drop*8).toFixed(1)}px)`:"none";
+        const fl=state.reduced?0:clamp(1-Math.abs(e-1)*2.5,0,1);
+        c.style.textShadow=fl>.05?`0 0 ${(fl*30).toFixed(0)}px var(--accent)`:"";
+      });
+      $("#t-b-giant").style.transform="none";
+      $("#t-b-giant").style.letterSpacing=`${((1-eo(clamp(tG*1.2,0,1)))*.25).toFixed(2)}em`;
+      S.byId.build.style.filter="none";
+      setSub(tG<=0?"BEYOND THE EDGE · THEN REVEALED":(landed<n?`LOCKING — ${String(landed).padStart(2,"0")} / ${n}`:"LOCKED — HOLD"));
+    }
+    if(hold>0&&pull<=0){ // overdrive: glow sweep races across the locked word as it blows past frame
+      const sweep=hold*(n+4)-2;
+      g.forEach((c,i)=>{
+        const d=Math.exp(-Math.pow(i-sweep,2)/3.5);
+        c.style.textShadow=d>.08?`0 0 ${(d*36).toFixed(0)}px var(--accent)`:"";
+      });
+      $("#t-b-giant").style.transform=`scale(${(1+hold*.5).toFixed(3)})`;
+      $("#t-b-giant").style.letterSpacing=`${(hold*.45).toFixed(2)}em`;
+      S.byId.build.style.filter=`blur(${(hold*3).toFixed(1)}px)`;
+      setSub("OVERDRIVE — BEYOND FRAME");
+    }
+    else if(pull>0){ // pull back reveals the whole word, tracking snaps home
+      g.forEach(c=>{ if(c.style.textShadow) c.style.textShadow=""; });
+      $("#t-b-giant").style.transform=`scale(${(1.5-pull*.5).toFixed(3)})`;
+      $("#t-b-giant").style.letterSpacing=`${((1-pull)*.45).toFixed(2)}em`;
+      S.byId.build.style.filter="none";
+      setSub("COMPLETE · INTELLIGENCE");
+    }
+    return;
+  }
+
+  /* ---- IDENTITY REVEAL — quiet, particles almost stop, slow pull back ---- */
+  if(sc==="identity"){
+    const lp=seg(sec,33,42);
+    fadeBlack.style.opacity=(1-seg(sec,33,33.8))*.9;
+    show("identity",1);
+    S.byId.identity.style.transform="none"; S.byId.identity.style.filter="none";
+    const name=[...document.querySelectorAll("#t-name .ch")];
+    name.forEach((c,i)=>{
+      const e=eo(clamp(lp*1.6-i*.03,0,1)); // strong editorial entrance
+      c.style.transform=`translateY(${((1-e)*46).toFixed(0)}px)`;
+      c.style.opacity=e; c.style.filter=`blur(${((1-e)*6).toFixed(1)}px)`;
+    });
+    [...document.querySelectorAll("#t-roles span")].forEach((r,i)=>{
+      const e=eo(clamp(lp*1.4-.22-i*.17,0,1)); // each title independently
+      r.style.transform=`translateY(${((1-e)*30).toFixed(0)}px)`; r.style.opacity=e;
+    });
+    return;
+  }
+
+  /* ---- PRINCIPLES — how I work: three rules, each takes the light ---- */
+  if(sc==="principles"){
+    const lp=seg(sec,42,46.5);
+    fadeBlack.style.opacity=(1-seg(sec,42,42.6))*.7;
+    show("principles",1);
+    S.byId.principles.style.transform="none"; S.byId.principles.style.filter="none";
+    const lines=["#t-pr-1","#t-pr-2","#t-pr-3"].map(s=>[...document.querySelectorAll(s+" .ch")]);
+    lines.forEach((ch,k)=>animateTypography(ch,["rise","quiet","expand"][k],clamp(lp*1.9-k*.42,0,1.15),time));
+    const pos=lp*3.6-0.3; // emphasis sweep: each rule takes the light in turn
+    lines.forEach((ch,k)=>{
+      const d=Math.exp(-Math.pow(k-pos,2)/.35);
+      ch.forEach(c=>{ c.style.textShadow=d>.1?`0 0 ${(d*30).toFixed(0)}px var(--accent)`:""; });
+    });
+    return;
+  }
+
+  /* ---- PHILOSOPHY — slow emotional section, one phrase at a time ---- */
+  if(sc==="philo"){
+    fadeBlack.style.opacity=(1-seg(sec,46.5,47.1))*.7;
+    const phrases=[0,1,2,3].map(k=>PHILO_POOL[(k+(state.philoShift||0))%PHILO_POOL.length]);
+    const slots=[[46.5,48.6],[48.8,50.9],[51.1,53.2],[53.4,55]];
+    let idx=0; slots.forEach((s,i)=>{ if(sec>=s[0]&&sec<s[1]) idx=i; });
+    show("philo",1);
+    S.byId.philo.style.transform="none"; S.byId.philo.style.filter="none";
+    const elx=$("#t-philo");
+    if(elx.dataset.ph!==String(idx)){
+      elx.dataset.ph=String(idx);
+      elx.textContent=phrases[idx];
+      splitWords(elx);
+      [...elx.querySelectorAll(".ch")].forEach(c=>c.dataset.orig=c.textContent);
+      $("#ph-kicker").innerHTML=`PHILOSOPHY — <b>0${idx+1} / 04</b>`;
+    }
+    const lp=seg(sec,slots[idx][0],slots[idx][1]);
+    const kin=["rise","quiet","expand","fragment"][idx]; // each phrase own movement
+    const fadeOut=lp>.82?1-(lp-.82)/.18:1;
+    S.byId.philo.style.opacity=fadeOut;
+    animateTypography([...elx.querySelectorAll(".ch")],kin,clamp(Math.min(1,lp*1.7)*1.15,0,1.2),time);
+    return;
+  }
+
+  /* ---- OPEN — availability: quiet confidence before the climax ---- */
+  if(sc==="open"){
+    const lp=seg(sec,55,60);
+    fadeBlack.style.opacity=(1-seg(sec,55,55.6))*.9;
+    show("open",1);
+    S.byId.open.style.transform="none"; S.byId.open.style.filter="none";
+    animateTypography([...document.querySelectorAll("#t-open-a .ch")],"quiet",clamp(lp/.35*1.15,0,1.15),time);
+    animateTypography([...document.querySelectorAll("#t-open-b .ch")],"expand",clamp((lp-.3)/.5*1.2,0,1.2),time);
+    const out=seg(sec,59.4,60);
+    if(out>0){ S.byId.open.style.filter=`blur(${(out*8).toFixed(1)}px)`; fadeBlack.style.opacity=out*.9; }
+    return;
+  }
+
+  /* ---- PROMISE — your idea, my execution, brought to life ---- */
+  if(sc==="promise"){
+    const lp=seg(sec,60,65);
+    fadeBlack.style.opacity=(1-seg(sec,60,60.6))*.7;
+    show("promise",1);
+    S.byId.promise.style.transform="none"; S.byId.promise.style.filter="none";
+    const lines=["#t-pm-1","#t-pm-2","#t-pm-3"].map(s=>[...document.querySelectorAll(s+" .ch")]);
+    lines.forEach((ch,k)=>animateTypography(ch,["rise","quiet","expand"][k],clamp(lp*1.9-k*.42,0,1.15),time));
+    const pos=lp*3.6-0.3; // each vow takes the light in turn
+    lines.forEach((ch,k)=>{
+      const d=Math.exp(-Math.pow(k-pos,2)/.35);
+      ch.forEach(c=>{ c.style.textShadow=d>.1?`0 0 ${(d*30).toFixed(0)}px var(--accent)`:""; });
+    });
+    return;
+  }
+
+  /* ---- FINAL — WHAT DOESN'T EXIST climax, push through, fade to black ---- */
+  if(sc==="final"){
+    const lp=seg(sec,65,73);
+    fadeBlack.style.opacity=(1-seg(sec,65,65.6))*.9;
+    show("final",1);
+    const A=[...document.querySelectorAll("#t-cta-a .ch")],
+          B=[...document.querySelectorAll("#t-cta-b .ch")],
+          C=[...document.querySelectorAll("#t-cta-c .ch")];
+    animateTypography(A,"quiet",clamp(lp/.3*1.15,0,1.15),time);
+    animateTypography(B,"expand",clamp((lp-.22)/.4*1.2,0,1.2),time); // visual climax
+    animateTypography(C,"letter",clamp((lp-.5)/.3*1.2,0,1.2),time);
+    const push=seg(sec,71.2,73);
+    if(push>0){ // camera slowly pushes through the words
+      $("#t-cta-b").style.transform=`scale(${(1+push*1.6).toFixed(3)})`;
+      S.byId.final.style.filter=`blur(${(push*12).toFixed(1)}px)`;
+      fadeBlack.style.opacity=push;
+    } else { $("#t-cta-b").style.transform="none"; S.byId.final.style.filter="none"; }
+    if(!state.reduced){ // traveling edge-shine: bright spot orbits each letter, flowing across the title
+      const op=orbitPalette(dark,ac,ink);
+      let k=0;
+      [...document.querySelectorAll("#t-cta-a .ch, #t-cta-b .ch, #t-cta-c .ch")].forEach(c=>{
+        const ph=time*2.4-(k++)*.55;
+        c.style.textShadow=`${(Math.cos(ph)*3).toFixed(1)}px ${(Math.sin(ph)*3).toFixed(1)}px 6px ${op.core}, 0 0 14px ${op.halo}`;
+      });
+    }
+    return;
+  }
+
+  /* ---- SIGN-OFF — small, centered, minimal, then loop-through-black (no end frame) ---- */
+  show("signoff",seg(sec,73,73.8)*(1-seg(sec,74.4,75)));
+  S.byId.signoff.style.transform="none"; S.byId.signoff.style.filter="none";
+  if(!state.reduced){
+    const op=orbitPalette(dark,ac,ink), ph=time*2;
+    $("#t-sign").style.textShadow=`${(Math.cos(ph)*1.5).toFixed(1)}px ${(Math.sin(ph)*1.5).toFixed(1)}px 5px ${op.core}`;
+  }
+  fadeBlack.style.opacity=Math.max(1-seg(sec,73,73.7), seg(sec,74.1,74.9)); // loop exit: dissolve to black
+}
+
+/* =====================================================================
+   SCORE TRACK — licensed background track: MotionArray "Pandora".
+   Saved as bgm.mp3 next to index.html.
+   Loops seamlessly and breathes with the story (softer in intimate
+   passages). On by default; browsers release audio on first tap/keypress.
+   Choice remembered.
+===================================================================== */
+const TRACK_SRC="bgm.mp3";
+const SCENE_VOL={opening:.55,design:.8,architect:.8,connect:.85,ai:.9,build:.85,identity:.5,principles:.55,philo:.45,open:.7,promise:.75,final:.9,signoff:.5};
+let MAudio=null;
+function initMusic(){
+  if(MAudio) return;
+  const a=document.createElement("audio");
+  a.id="bgm"; a.loop=true; a.preload="auto"; a.src=TRACK_SRC; a.volume=0;
+  a.addEventListener("error",()=>toast("PLACE bgm.mp3 NEXT TO index.html"),{once:true});
+  document.body.appendChild(a);
+  MAudio=a;
+  unlockMusic();
+  setTimeout(()=>{ if(state.music&&a.paused) toast("SOUND IS ON — TAP ONCE TO BEGIN"); },1800);
+}
+function fadeTrack(v){
+  if(!MAudio) return;
+  const a=MAudio, from=a.volume, t0=performance.now();
+  clearInterval(a._f);
+  a._f=setInterval(()=>{
+    const k=Math.min(1,(performance.now()-t0)/450);
+    a.volume=from+(v-from)*k;
+    if(k>=1) clearInterval(a._f);
+  },30);
+}
+function unlockMusic(){
+  if(!MAudio) return;
+  if(state.music){
+    const p=MAudio.play();
+    if(p&&p.catch) p.catch(()=>{});
+    fadeTrack(SCENE_VOL[state.musicScene]||.8);
+  }
+  syncSoundBtn();
+}
+function musicScene(sc){ // gentle dynamics: the track breathes with the story
+  if(!MAudio||!state.music||MAudio.paused) return;
+  fadeTrack(SCENE_VOL[sc]||.8);
+}
+
+
+function filmTurn(sc){ // story-turn impulses: shockwave + crash-zoom + dutch kick (quiet acts stay locked)
+  if(state.reduced) return;
+  const big=(sc==="design"||sc==="connect"||sc==="ai"||sc==="final");
+  const mid=(sc==="architect"||sc==="build"||sc==="open"||sc==="promise");
+  state.shock=big?1:(mid?.65:0);
+  state.punch=big?.75:(mid?.45:0);
+  state.dutch=(sc==="connect"||sc==="architect")?(Math.random()<.5?-1:1)*(big?.7:.5):0;
+}
+function applyQuality(tier){ // adaptive tiers keep the film at 60fps on weak devices
+  if(state.quality===tier) return;
+  state.quality=tier;
+  document.body.classList.toggle("lowq",tier==="low");
+  sizeFilms(); // rebuilds particle counts + smoke stride for the tier
+}
+
+/* LIVING LOOPS — each replay varies slightly so the endless film surprises.
+   Finale taglines rotate, philosophy windows slide through a larger pool. */
+const FIN_ALT=[
+  ["LET'S CREATE","WHAT DOESN'T EXIST","yet."],
+  ["IMAGINE MORE","BUILD THE UNSEEN","now."],
+  ["DESIGN TOMORROW","FEEL THE SIGNAL","always."]
+];
+const PHILO_POOL=["CURIOUS BY NATURE.","BUILDING BY PRACTICE.","LEARNING BY EXPLORATION.","EXPERIMENTING WITH AI.",
+  "QUESTION EVERYTHING.","PROTOTYPE TOMORROW.","LISTEN TO THE SIGNAL.","CRAFT WITH QUIET FIRE."];
+function setFinaleText(v){
+  ["t-cta-a","t-cta-b","t-cta-c"].forEach((id,k)=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.textContent=FIN_ALT[v][k];
+    splitWords(el);
+    [...el.querySelectorAll(".ch")].forEach(c=>c.dataset.orig=c.textContent);
+  });
+}
+function livingLoop(){
+  setFinaleText((state.loops-1)%FIN_ALT.length);
+  state.philoShift=((state.philoShift||0)+1)%PHILO_POOL.length;
+  const ph=document.getElementById("t-philo"); if(ph) ph.dataset.ph="x"; // force rebuild on next visit
+}
+function syncSoundBtn(){
+  const b=$("#btn-sound"); if(!b) return;
+  if(!state.music){ b.textContent="SOUND OFF"; return; }
+  b.textContent=(MAudio&&!MAudio.paused)?"SOUND ON":"SOUND ON • TAP";
+}
+
+/* =====================================================================
+   TRANSPORT — playTimeline() / pauseTimeline()
+===================================================================== */
+function playTimeline(){ state.playing=true; $("#btn-play").textContent="PAUSE"; }
+function pauseTimeline(){ state.playing=false; $("#btn-play").textContent="PLAY"; }
+function seekTo(sec){
+  sec=clamp(sec,0,CONFIG.duration-0.01);
+  if(state.scrollMode){
+    const track=$("#scroll-track");
+    window.scrollTo({top:(sec/CONFIG.duration)*(track.offsetHeight-innerHeight),behavior:"auto"});
+  } else state.time=sec;
+}
+function toast(msg){ const t=$("#toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2200); }
+function jumpScene(i){ // director chapters: keys 1–0 jump the film
+  const sc=CONFIG.timeline[i]; if(!sc) return;
+  seekTo(sc.t0+.02); toast(sc.label+" — "+sc.scene.toUpperCase());
+}
+function toggleHelp(){ $("#help").classList.toggle("show"); }
+
+/* =====================================================================
+   INTERACTION — handlePointer() / handleScroll()
+===================================================================== */
+function handlePointer(){
+  addEventListener("pointermove",e=>{
+    state.pointer.tx=(e.clientX/innerWidth-.5)*2;
+    state.pointer.ty=(e.clientY/innerHeight-.5)*2;
+    document.body.classList.add("awake");
+    clearTimeout(state.idleTimer);
+    state.idleTimer=setTimeout(()=>{ if(state.playing) document.body.classList.remove("awake"); },2600);
+  },{passive:true});
+}
+function handleScroll(){
+  addEventListener("scroll",()=>{
+    if(!state.scrollMode) return;
+    const max=document.documentElement.scrollHeight-innerHeight;
+    state.scrollTarget=clamp(scrollY/Math.max(1,max),0,.999)*CONFIG.duration;
+    $("#hint").style.opacity=scrollY>120?0:1;
+  },{passive:true});
+  // in AUTO, deliberate wheel travel nudges the film (primary experience stays automatic, wraps around the loop)
+  let acc=0;
+  addEventListener("wheel",e=>{
+    if(state.scrollMode||state.reduced) return;
+    acc+=Math.abs(e.deltaY);
+    if(acc>240){ state.time=(state.time+e.deltaY*.004+CONFIG.duration)%CONFIG.duration; acc=0; }
+  },{passive:true});
+}
+function handleUI(){
+  $("#btn-play").onclick=()=>{ state.playing?pauseTimeline():playTimeline(); };
+  $("#btn-mode").onclick=e=>{
+    state.scrollMode=!state.scrollMode;
+    e.target.textContent=state.scrollMode?"SCROLL ▸ AUTO":"AUTO ▸ SCROLL";
+    toast(state.scrollMode?"SCROLL MODE — DOWN IS FORWARD · UP IS BACK":"AUTO MODE — THE FILM PLAYS ITSELF");
+    if(state.scrollMode){
+      pauseTimeline();
+      state.scrollTarget=state.time;
+      const track=$("#scroll-track");
+      window.scrollTo({top:(state.time/CONFIG.duration)*(track.offsetHeight-innerHeight)});
+    } else playTimeline();
+  };
+  const track=$("#track"); let scrub=false; // touch-drag scrub: press and slide across time
+  const seekDrag=e=>{ const r=track.getBoundingClientRect(); seekTo(clamp((e.clientX-r.left)/r.width,0,1)*CONFIG.duration); };
+  track.addEventListener("pointerdown",e=>{ scrub=true; try{track.setPointerCapture(e.pointerId);}catch(_){} seekDrag(e); });
+  track.addEventListener("pointermove",e=>{ if(scrub) seekDrag(e); });
+  track.addEventListener("pointerup",()=>{ scrub=false; });
+  track.addEventListener("pointercancel",()=>{ scrub=false; });
+  $("#portfolio-cta").onclick=()=>{ window.open("https://venkateshcreations.github.io/portfolio/","_blank","noopener"); };
+  $("#btn-sound").onclick=()=>{
+    state.music=!state.music;
+    try{ localStorage.setItem("aboutme-sound",state.music?"on":"off"); }catch(e){}
+    if(MAudio){
+      if(state.music){ MAudio.play().catch(()=>{}); fadeTrack(SCENE_VOL[state.musicScene]||.8); }
+      else { fadeTrack(0); setTimeout(()=>{ if(!state.music&&MAudio) MAudio.pause(); },500); }
+    }
+    syncSoundBtn();
+    toast(state.music?"SOUND ON":"SOUND OFF");
+  };
+  addEventListener("keydown",e=>{
+    if(e.code==="Space"){ e.preventDefault(); state.playing?pauseTimeline():playTimeline(); }
+    if(e.key==="ArrowRight") seekTo(state.time+1.5);
+    if(e.key==="ArrowLeft") seekTo(state.time-1.5);
+    if(e.key>="1"&&e.key<="9") jumpScene(+e.key-1);
+    if(e.key==="0") jumpScene(9);
+    if(e.key==="h"||e.key==="H"){ const c=document.body.classList.toggle("clean"); toast(c?"CLEAN CAPTURE — H TO RESTORE":"CHROME RESTORED"); }
+    if(e.key==="?") toggleHelp();
+    if(e.key==="Escape") $("#help").classList.remove("show");
+  });
+}
+
+/* =====================================================================
+   MAIN LOOP — requestAnimationFrame, GPU transforms, visibility-aware
+===================================================================== */
+function loop(ts){
+  if(state.destroyed) return;
+  requestAnimationFrame(loop);
+  if(!state.visible) return;
+  const dt=Math.min(.05,(ts-state.lastTs)/1000||.016);
+  state.lastTs=ts;
+  state.fpsEMA=lerp(state.fpsEMA,1/Math.max(dt,1e-3),.05); // adaptive quality watch
+  if(ts-state.qCool>4000){
+    if(state.fpsEMA<45&&state.quality!=="low"){ applyQuality(state.quality==="high"?"medium":"low"); state.qCool=ts; }
+    else if(state.fpsEMA>58&&state.quality!=="high"){ applyQuality(state.quality==="low"?"medium":"high"); state.qCool=ts; }
+  }
+  state.pointer.x=lerp(state.pointer.x,state.pointer.tx,1-Math.pow(.002,dt));
+  state.pointer.y=lerp(state.pointer.y,state.pointer.ty,1-Math.pow(.002,dt));
+  if(state.playing && !state.scrollMode){
+    state.time+=dt;
+    if(state.time>=CONFIG.duration){ state.time-=CONFIG.duration; state.loops++; livingLoop(); } // endless loop — each replay varies
+  }
+  if(state.scrollMode){ // smoothed scrub: scroll sets a target, film eases toward it (cinematic, reversible)
+    state.time=lerp(state.time,state.scrollTarget,1-Math.pow(.0005,dt));
+    if(Math.abs(state.time-state.scrollTarget)<.002) state.time=state.scrollTarget;
+  }
+  const sec=clamp(state.time,0,CONFIG.duration-0.001);
+  const scId=sceneAt(sec).scene;
+  if(scId!==state.musicScene){ state.musicScene=scId; musicScene(scId); filmTurn(scId); }
+  driveTimeline(sec,ts/1000);
+  $("#fill").style.transform=`scaleX(${sec/CONFIG.duration})`;
+  const s=Math.floor(sec);
+  $("#tc").textContent=`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+  const badge=$("#loop-badge"); if(badge) badge.textContent=`LOOP ${String(state.loops).padStart(2,"0")}`;
+  if(spotEl){ // cursor-following light wash — brightens smoke and type where you look
+    if(state.reduced){ spotEl.style.opacity=.12;
+      spotEl.style.transform=`translate3d(${innerWidth/2}px,${innerHeight/2}px,0) translate(-50%,-50%)`; }
+    else{
+      const sx=(state.pointer.x*.5+.5)*innerWidth, sy=(state.pointer.y*.5+.5)*innerHeight;
+      spotEl.style.transform=`translate3d(${sx.toFixed(1)}px,${sy.toFixed(1)}px,0) translate(-50%,-50%)`;
+      spotEl.style.opacity=(.32+state.warp*.3).toFixed(2);
+    }
+  }
+}
+function init(){
+  createTextAnimation();
+  sizeFilms();
+  initSmoke();
+  try{ if(localStorage.getItem("aboutme-sound")==="off") state.music=false; }catch(e){}
+  addEventListener("resize",sizeFilms);
+  handlePointer(); handleScroll(); handleUI();
+  initMusic(); // default ON — browser releases it on first tap/keypress
+  ["pointerdown","keydown","touchstart"].forEach(ev=>addEventListener(ev,unlockMusic,{passive:true}));
+  document.addEventListener("visibilitychange",()=>{
+    state.visible=!document.hidden;
+    if(!MAudio) return;
+    if(document.hidden) MAudio.pause();
+    else if(state.music) unlockMusic();
+  });
+  new IntersectionObserver(en=>{ state.visible=en[0].isIntersecting; }).observe($("#stage"));
+  syncSoundBtn();
+  CONFIG.timeline.forEach(s=>{ // labeled chapter ticks on the transport
+    const t=document.createElement("div"); t.className="tick";
+    t.style.left=(s.t0/CONFIG.duration*100)+"%"; t.title=s.label+" · "+s.t0+"s";
+    $("#track").appendChild(t);
+  });
+  if(state.reduced) toast("REDUCED MOTION — GENTLE FADES");
+  const lead=$("#leader"); let li=3; // film-leader countdown — typographic, no shapes
+  const pulse=()=>{ lead.style.animation="none"; void lead.offsetWidth; lead.style.animation=""; };
+  const lh=setInterval(()=>{
+    li--;
+    if(li<=0){ clearInterval(lh); $("#loader").classList.add("hide"); }
+    else { lead.textContent=li; pulse(); }
+  },360);
+  setTimeout(()=>{ if(state.playing) document.body.classList.remove("awake"); },3200);
+  requestAnimationFrame(loop);
+}
+document.readyState==="loading"?document.addEventListener("DOMContentLoaded",init):init();
+</script>
+</body>
+</html>
