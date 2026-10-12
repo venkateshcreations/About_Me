@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- PT-SEO -->
+<meta name="description" content="Showreel II: storyboards, motion, prototypes, systems and creative direction for AI-native products. By Venkatesh Ammireddy." />
+<link rel="canonical" href="https://venkateshcreations.github.io/About_Me/creative-ux-director.html" />
+<meta name="theme-color" content="#0b0b0e" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://venkateshcreations.github.io/About_Me/creative-ux-director.html" />
+<meta property="og:title" content="Creative UX Director Showreel (15s) — Venkatesh Ammireddy" />
+<meta property="og:description" content="Showreel II: storyboards, motion, prototypes, systems and creative direction for AI-native products. By Venkatesh Ammireddy." />
+<meta property="og:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="Creative UX Director Showreel (15s) — Venkatesh Ammireddy" />
+<meta property="twitter:description" content="Showreel II: storyboards, motion, prototypes, systems and creative direction for AI-native products. By Venkatesh Ammireddy." />
+<meta property="twitter:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Creative UX Director Showreel (15s) — Venkatesh Ammireddy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#E9EEF7;--fg:#04121A;--bar:#fff;--acc:#5B2BFF;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050A10;--fg:#E9EEF7;--bar:#121C26;--acc:#9A7BFF}}
+:root[data-theme="dark"]{--bg:#050A10;--fg:#E9EEF7;--bar:#121C26;--acc:#9A7BFF}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:"Instrument Sans",system-ui,Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center}
+main{width:min(100vw,calc((100vh - 90px) * 16 / 9));padding:12px}
+.stage{aspect-ratio:16/9;width:100%;border-radius:18px;overflow:hidden;background:#04121A;box-shadow:0 30px 80px -30px rgba(0,0,40,.6);cursor:pointer}
+canvas{display:block;width:100%;height:100%}
+.ctl{display:flex;align-items:center;gap:14px;margin-top:14px;padding:8px 10px;background:var(--bar);border-radius:999px}
+button{font:inherit;font-weight:600;border:0;border-radius:999px;background:var(--acc);color:#fff;padding:9px 20px;cursor:pointer;min-width:92px}
+button:focus-visible,input:focus-visible{outline:3px solid #FF6A1A;outline-offset:2px}
+input[type=range]{flex:1;accent-color:var(--acc);min-width:0}
+output{font-variant-numeric:tabular-nums;font-weight:600;min-width:84px;text-align:right}
+</style>
+<link rel="stylesheet" href="tabs.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+<main>
+  <div class="stage" id="stage" aria-label="Creative UX director showreel, 15 seconds"><canvas id="c" width="1920" height="1080"></canvas></div>
+  <div class="ctl">
+    <button id="pp" type="button">Pause</button>
+    <input id="sc" type="range" min="0" max="15" step="0.01" value="0" aria-label="Scrub timeline">
+    <output id="tm">0.0 / 15.0s</output>
+  </div>
+</main>
+<script>
+const NAME="Venkatesh Ammireddy"; // edit me
+const ROLE="Creative UX Director";
+const W=1920,H=1080,DUR=15;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const C={ink:'#04121A',org:'#FF6A1A',vio:'#5B2BFF',cy:'#3DE1FF',ice:'#D9E2F2',wh:'#fff'};
+const DISP='Syne,"Arial Black",Helvetica,sans-serif',SANS='"Instrument Sans",Helvetica,Arial,sans-serif';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),p=(t,a,b)=>clamp((t-a)/(b-a)),lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:x=>1-Math.pow(1-x,4),expo:x=>x>=1?1:1-Math.pow(2,-10*x),io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  back:x=>{const c=1.70158,d=c+1;return 1+d*Math.pow(x-1,3)+c*Math.pow(x-1,2)}};
+function rnd(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function rr(x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function txt(s,x,y,font,col,al='left'){ctx.font=font;ctx.fillStyle=col;ctx.textAlign=al;ctx.textBaseline='alphabetic';ctx.fillText(s,x,y)}
+const _fc={};
+function fit(s,w,mx,wt='800',fam=DISP){const k=s+w+mx+wt;if(_fc[k])return _fc[k];ctx.font=`${wt} 100px ${fam}`;return _fc[k]=Math.min(mx,100*w/ctx.measureText(s).width)}
+const bg=c=>{ctx.fillStyle=c;ctx.fillRect(0,0,W,H)};
+
+/* ===== 1. Liquid ink swallows the title ===== */
+const L=document.createElement('canvas');L.width=480;L.height=270;const lx=L.getContext('2d');
+function s1(u){
+  bg(C.org);
+  const k=E.expo(p(u,.1,.9));
+  ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();
+  const z=Math.min(fit('Creative',1560,260),fit('UX Director',1560,260)),y1=500-z*.02,y2=y1+z*1.05;
+  ctx.font=`800 ${z}px ${DISP}`;ctx.textAlign='center';ctx.fillStyle=C.ink;
+  ctx.fillText('Creative',960,y1+(1-k)*500);
+  ctx.fillText('UX Director',960,y2+(1-k)*500);ctx.restore();
+  if(u>.7){
+    lx.fillStyle='#fff';lx.fillRect(0,0,480,270);lx.fillStyle='#000';
+    const R=rnd(7),cover=E.io(p(u,1.5,2.5));
+    for(let i=0;i<9;i++){
+      const sa=R()*6.28,sx=240+Math.cos(sa)*420,sy=135+Math.sin(sa)*280;
+      const m=E.io(p(u,.7+i*.05,1.9)),w=u*2+i;
+      const x=lerp(sx,240+Math.cos(w)*50,m),y=lerp(sy,135+Math.sin(w*1.3)*30,m);
+      lx.beginPath();lx.arc(x,y,24+R()*22+cover*340,0,7);lx.fill();
+    }
+    ctx.save();ctx.globalCompositeOperation='multiply';
+    if('filter' in ctx)ctx.filter='blur(14px) contrast(40)';
+    ctx.drawImage(L,0,0,W,H);ctx.restore();
+  }
+}
+
+/* ===== 2. 3D type tunnel + slam ===== */
+const WORDS=['UX','MOTION','SYSTEMS','AI','BRAND','STORY','CRAFT','FLOW'];
+function s2(u){
+  bg(C.ink);
+  const N=8,fade=1-p(u,2.0,2.35);
+  ctx.save();ctx.translate(960+Math.sin(u*31)*4*fade,540+Math.cos(u*27)*4*fade);
+  if(fade>0)for(let k=0;k<N;k++){
+    const f=((u*2.4+k)%N)/N,sc=.04+Math.pow(f,3)*7,a=Math.sin(Math.PI*Math.pow(f,.55))*fade;
+    if(a<.02)continue;
+    ctx.save();ctx.rotate(Math.sin(k*1.7)*.12+u*.05);ctx.scale(sc,sc);ctx.globalAlpha=a;
+    ctx.font=`800 170px ${DISP}`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.lineWidth=2.5/Math.max(sc,.3);ctx.strokeStyle=[C.cy,C.org,C.wh][k%3];ctx.strokeText(WORDS[k],0,0);
+    ctx.restore();
+  }
+  ctx.restore();
+  if(u>2.2){
+    const k=E.back(p(u,2.2,2.75)),s=lerp(2.4,1,k),jit=(1-p(u,2.2,2.8))*14,z=fit('DIRECTION',1560,230);
+    const rp=p(u,2.3,3);if(rp>0&&rp<1){ctx.strokeStyle=C.cy;ctx.globalAlpha=1-rp;ctx.lineWidth=8;ctx.beginPath();ctx.arc(960,540,E.out(rp)*1000,0,7);ctx.stroke();ctx.globalAlpha=1}
+    ctx.save();ctx.translate(960,500);ctx.scale(s,s);ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`800 ${z}px ${DISP}`;
+    ctx.globalCompositeOperation='screen';ctx.fillStyle=C.cy;ctx.fillText('DIRECTION',-jit,0);ctx.fillStyle=C.org;ctx.fillText('DIRECTION',jit,0);
+    ctx.globalCompositeOperation='source-over';ctx.fillStyle=C.wh;ctx.fillText('DIRECTION',0,0);ctx.restore();
+    ctx.globalAlpha=E.out(p(u,2.6,2.8));txt('from first sketch to shipped motion',960,500+z*.5+80,`400 44px ${SANS}`,C.ice,'center');ctx.globalAlpha=1;
+  }
+}
+
+/* ===== 3. Rotating device, AI orb, orbiting intent chips ===== */
+const CHIPS=['Intent','Context','Tone','Layout','Motion'];
+function chipDraw(i,u,pass){
+  const a=u*.9+i*1.2566,x=960+Math.cos(a)*620,y=540+Math.sin(a)*330,d=(Math.sin(a)+1)/2;
+  if((d<.5)!==(pass===0))return;
+  const k=E.back(p(u,.7+i*.1,1.3+i*.1));if(k<=0)return;
+  const g=p(u,1+i*.1,1.8);
+  ctx.strokeStyle='rgba(4,18,26,.3)';ctx.lineWidth=2;ctx.setLineDash([8,10]);ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(lerp(x,960,g*.78),lerp(y,540,g*.78));ctx.stroke();ctx.setLineDash([]);
+  const s=(.8+d*.4)*k;ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.font=`700 40px ${DISP}`;const w=ctx.measureText(CHIPS[i]).width+64;
+  ctx.shadowColor='rgba(4,18,26,.25)';ctx.shadowBlur=30;ctx.shadowOffsetY=12;ctx.fillStyle=i%2?C.ink:C.wh;rr(-w/2,-38,w,76,38);ctx.fill();ctx.shadowColor='transparent';
+  ctx.fillStyle=[C.org,C.vio,C.cy][i%3];ctx.beginPath();ctx.arc(-w/2+34,0,9,0,7);ctx.fill();
+  txt(CHIPS[i],-w/2+54,13,`700 40px ${DISP}`,i%2?C.wh:C.ink);ctx.restore();
+}
+function s3(u){
+  bg(C.ice);
+  ctx.fillStyle='rgba(91,43,255,.08)';ctx.beginPath();ctx.arc(960,540,480+Math.sin(u*2)*30,0,7);ctx.fill();
+  for(let i=0;i<5;i++)chipDraw(i,u,0);
+  const rot=lerp(1.5,0,E.out(p(u,0,1.1))),sx=Math.cos(rot);
+  if(Math.abs(sx)>.03){
+    ctx.save();ctx.translate(960,540);ctx.scale(sx,1);
+    ctx.shadowColor='rgba(4,18,26,.4)';ctx.shadowBlur=70;ctx.shadowOffsetY=30;ctx.fillStyle=C.ink;rr(-190,-390,380,780,66);ctx.fill();ctx.shadowColor='transparent';
+    ctx.fillStyle=C.wh;rr(-176,-376,352,752,54);ctx.fill();ctx.save();rr(-176,-376,352,752,54);ctx.clip();
+    txt('Good Day!',-136,-290,`700 44px ${DISP}`,C.ink);txt('What are we making?',-136,-246,`400 28px ${SANS}`,'#5a6a78');
+    const m=E.io(p(u,1.5,2.1)),oy=lerp(-20,-250+560,m)-(1-m)*0,r=lerp(105,30,m)+Math.sin(u*5)*5*(1-m);
+    const oyy=lerp(0,230,m);
+    const g=ctx.createRadialGradient(-r*.3,oyy-r*.3,r*.1,0,oyy,r);g.addColorStop(0,C.cy);g.addColorStop(.55,C.vio);g.addColorStop(1,C.org);
+    ctx.fillStyle=g;ctx.beginPath();ctx.arc(0,oyy,r,0,7);ctx.fill();
+    const sh=E.out(p(u,1.6,2.3)),sy=lerp(400,-120,sh);
+    ctx.fillStyle='#EEF2FA';rr(-176,sy,352,520,48);ctx.fill();
+    for(let i=0;i<3;i++){const k=E.back(p(u,1.9+i*.12,2.4+i*.12));ctx.save();ctx.translate(0,sy+80+i*120);ctx.scale(1,Math.max(k,0));
+      ctx.fillStyle=C.wh;rr(-146,-45,292,90,26);ctx.fill();ctx.fillStyle=[C.org,C.vio,C.cy][i];ctx.beginPath();ctx.arc(-98,0,24,0,7);ctx.fill();
+      ctx.fillStyle='#CBD5E4';rr(-56,-18,170-i*30,16,8);ctx.fill();rr(-56,8,110,12,6);ctx.fill();ctx.restore()}
+    ctx.restore();ctx.restore();
+  }
+  for(let i=0;i<5;i++)chipDraw(i,u,1);
+}
+
+/* ===== 4. Sliced type ===== */
+function s4(u){
+  bg(C.vio);
+  const S=10,sw=W/S;
+  for(let i=0;i<S;i++){
+    const m=E.expo(p(u,i*.05,i*.05+.9)),dir=i%2?1:-1,wave=Math.sin(u*5+i*.6)*40*p(u,1.3,1.8);
+    ctx.save();ctx.beginPath();ctx.rect(i*sw,0,sw+1,H);ctx.clip();
+    ctx.fillStyle=i%2?'#4A1FE0':'#6A3DFF';ctx.fillRect(i*sw,0,sw,H);
+    const z=fit('CRAFT',1720,480);ctx.font=`800 ${z}px ${DISP}`;ctx.textAlign='center';ctx.fillStyle=i%3==0?C.org:C.wh;
+    ctx.fillText('CRAFT',960,540+z*.36+(1-m)*1200*dir+wave);ctx.restore();
+  }
+  const off=u*260;ctx.font=`700 54px ${DISP}`;ctx.fillStyle=C.cy;ctx.textAlign='left';
+  const s='motion design + ux systems + brand worlds + prototypes + ',w=ctx.measureText(s).width;
+  ctx.globalAlpha=E.out(p(u,.8,1.4));
+  for(let x=-(off%w);x<W;x+=w)ctx.fillText(s,x,90);
+  for(let x=-w+(off%w);x<W;x+=w)ctx.fillText(s,x,1030);ctx.globalAlpha=1;
+}
+
+/* ===== 5. Particles assemble the name ===== */
+let PT=[];
+function initParticles(){
+  const o=document.createElement('canvas');o.width=W;o.height=H;const x=o.getContext('2d');
+  const z=fit(NAME,1640,270),rz=fit(ROLE,1200,70,'600',SANS);x.fillStyle='#fff';x.textAlign='center';x.font=`800 ${z}px ${DISP}`;x.fillText(NAME,960,500);
+  x.font=`600 ${rz}px ${SANS}`;x.fillText(ROLE,960,500+z*.22+rz+30);
+  const d=x.getImageData(0,0,W,H).data,R=rnd(11),pts=[];
+  for(let y=0;y<H;y+=7)for(let xx=0;xx<W;xx+=7)if(d[(y*W+xx)*4+3]>128)pts.push([xx,y]);
+  PT=pts.map(([tx,ty])=>{const a=R()*6.28,r=350+R()*900;return{tx,ty,sx:960+Math.cos(a)*r,sy:540+Math.sin(a)*r,d:R()*.9,z:2+R()*4}});
+}
+function s5(u){
+  bg(C.ink);
+  const sweep=lerp(-300,2300,p(u,2.2,3.3));
+  for(const q of PT){
+    const k=E.io(p(u,q.d,q.d+1.4)),perp=Math.sin(k*Math.PI)*260*(q.d-.45);
+    let x=lerp(q.sx,q.tx,k)-(q.ty-540)/400*perp,y=lerp(q.sy,q.ty,k)+(q.tx-960)/900*perp;
+    x+=Math.sin(u*3+q.tx)*1.4*k;y+=Math.cos(u*3+q.ty)*1.4*k;
+    const t=q.tx/W,near=Math.abs(q.tx-sweep)<110;
+    ctx.fillStyle=near?'#fff':t<.5?`rgb(255,${Math.round(106+t*300)},${Math.round(26+t*400)})`:`rgb(${Math.round(255-(t-.5)*400)},${Math.round(150+(t-.5)*100)},255)`;
+    const s=q.z*(.4+.6*k)+(near?2:0);ctx.fillRect(x,y,s,s);
+  }
+  const a=E.out(p(u,2.3,3));ctx.globalAlpha=a;
+  ctx.font=`400 40px ${SANS}`;const aw=ctx.measureText('Available for select projects').width;
+  ctx.fillStyle=C.org;ctx.beginPath();ctx.arc(960-aw/2-28,880,10+3*Math.sin(u*6),0,7);ctx.fill();
+  txt('Available for select projects',960+20,893,`400 40px ${SANS}`,C.ice,'center');ctx.globalAlpha=1;
+}
+
+/* ===== timeline + transitions ===== */
+const SC=[{s:0,e:2.8,f:s1,t:'cut'},{s:2.8,e:5.6,f:s2,t:'cut'},{s:5.6,e:8.6,f:s3,t:'bars'},{s:8.6,e:11.6,f:s4,t:'diag'},{s:11.6,e:15,f:s5,t:'circ'}];
+const grain=document.createElement('canvas');grain.width=grain.height=200;
+(function(){const g=grain.getContext('2d'),im=g.createImageData(200,200),R=rnd(3);for(let i=0;i<im.data.length;i+=4){const v=R()*255;im.data[i]=im.data[i+1]=im.data[i+2]=v;im.data[i+3]=255}g.putImageData(im,0,0)})();
+function clipFor(type,k){
+  ctx.beginPath();
+  if(type==='bars'){for(let b=0;b<8;b++){const q=E.out(p(k,b*.07,b*.07+.5));ctx.rect(0,b*H/8,W*q,H/8+1)}}
+  else if(type==='diag'){const x=lerp(-H,W+H,E.io(k));ctx.moveTo(0,0);ctx.lineTo(x,0);ctx.lineTo(x-H,H);ctx.lineTo(0,H);ctx.closePath()}
+  else ctx.arc(960,540,E.io(k)*1400,0,7);
+  ctx.clip();
+}
+function render(t){
+  let i=SC.findIndex(x=>t>=x.s&&t<x.e);if(i<0)i=SC.length-1;
+  const sc=SC[i],u=t-sc.s,k=p(u,0,.65);
+  if(sc.t!=='cut'&&k<1){const pv=SC[i-1];pv.f(pv.e-pv.s);ctx.save();clipFor(sc.t,k);sc.f(u);ctx.restore()}else sc.f(u);
+  ctx.fillStyle='rgba(255,255,255,.85)';ctx.fillRect(0,H-8,W*t/DUR,8);
+  const n=Math.floor(t*24);ctx.save();ctx.globalAlpha=.07;ctx.globalCompositeOperation='overlay';
+  ctx.fillStyle=ctx.createPattern(grain,'repeat');ctx.translate((n*53)%200,(n*97)%200);ctx.fillRect(-200,-200,W+400,H+400);ctx.restore();
+}
+
+/* ===== player ===== */
+const pp=document.getElementById('pp'),sl=document.getElementById('sc'),tm=document.getElementById('tm');
+let t=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=performance.now();
+function ui(){pp.textContent=playing?'Pause':'Play';sl.value=t;tm.textContent=t.toFixed(1)+' / 15.0s'}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing){t+=dt;if(t>=DUR)t=0}render(t);ui();requestAnimationFrame(loop)}
+pp.onclick=()=>{playing=!playing};
+document.getElementById('stage').onclick=()=>{playing=!playing};
+sl.oninput=()=>{t=parseFloat(sl.value)};
+addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();playing=!playing}});
+const go=()=>{for(const k in _fc)delete _fc[k];initParticles();last=performance.now();requestAnimationFrame(loop)};
+Promise.race([Promise.all([document.fonts.load(`800 100px Syne`),document.fonts.load(`600 40px "Instrument Sans"`)]),new Promise(r=>setTimeout(r,2500))]).then(go,go);
+</script>
+<script src="tabs.js" defer></script>
+</body>
+</html>

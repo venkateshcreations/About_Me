@@ -1,0 +1,80 @@
+/* Shared tab navigation for About_Me profile intros.
+   Injected into every reel HTML. Fixed top, glass, horizontally scrollable.
+   z-index 9999 keeps it above full-screen canvas films. */
+#profile-tabs {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+  background: rgba(8, 8, 12, 0.72);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+#profile-tabs::-webkit-scrollbar { display: none; }
+#profile-tabs .pt-brand {
+  flex: 0 0 auto;
+  font: 600 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  padding: 8px 6px 8px 2px;
+  white-space: nowrap;
+  user-select: none;
+}
+#profile-tabs a.pt-tab {
+  flex: 0 0 auto;
+  font: 600 11px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 999px;
+  padding: 8px 14px;
+  white-space: nowrap;
+  transition: background 0.25s, color 0.25s, border-color 0.25s;
+}
+#profile-tabs a.pt-tab:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+#profile-tabs a.pt-tab.active {
+  background: var(--pt-accent, #fff);
+  border-color: var(--pt-accent, #fff);
+  color: #0b0b0e;
+  box-shadow: 0 0 18px -4px var(--pt-accent, transparent);
+}
+#profile-tabs button.pt-sound {
+  flex: 0 0 auto;
+  margin-left: auto;
+  font: 600 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  border-radius: 999px;
+  padding: 8px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+#profile-tabs button.pt-sound:hover { background: rgba(255, 255, 255, 0.14); }
+#profile-tabs button.pt-sound:focus-visible,
+#profile-tabs a.pt-tab:focus-visible {
+  outline: 2px solid #ff8a3d;
+  outline-offset: 2px;
+}
+@media (max-width: 640px) {
+  #profile-tabs { gap: 4px; padding: 6px 8px; }
+  #profile-tabs .pt-brand { display: none; }
+  #profile-tabs a.pt-tab { padding: 7px 11px; font-size: 10px; }
+}

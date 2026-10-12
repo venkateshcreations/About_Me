@@ -1,0 +1,221 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- PT-SEO -->
+<meta name="description" content="A 20-second showreel on futuristic UX engineering: agentic UX, custom skills and AI-human interaction design by Venkatesh Ammireddy." />
+<link rel="canonical" href="https://venkateshcreations.github.io/About_Me/ai-native-ux-engineering-20s.html" />
+<meta name="theme-color" content="#0b0b0e" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://venkateshcreations.github.io/About_Me/ai-native-ux-engineering-20s.html" />
+<meta property="og:title" content="AI-Native UX Engineering (20s) — Venkatesh Ammireddy" />
+<meta property="og:description" content="A 20-second showreel on futuristic UX engineering: agentic UX, custom skills and AI-human interaction design by Venkatesh Ammireddy." />
+<meta property="og:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="AI-Native UX Engineering (20s) — Venkatesh Ammireddy" />
+<meta property="twitter:description" content="A 20-second showreel on futuristic UX engineering: agentic UX, custom skills and AI-human interaction design by Venkatesh Ammireddy." />
+<meta property="twitter:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI-Native UX Engineering (20s) — Venkatesh Ammireddy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEEBFF;--fg:#0B0B2B;--bar:#fff;--acc:#2B2BFF;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07071C;--fg:#EEEBFF;--bar:#15153A;--acc:#8C8CFF}}
+:root[data-theme="dark"]{--bg:#07071C;--fg:#EEEBFF;--bar:#15153A;--acc:#8C8CFF}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:"Bricolage Grotesque",system-ui,Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center}
+main{width:min(100vw,calc((100vh - 90px) * 16 / 9));padding:12px}
+.stage{aspect-ratio:16/9;width:100%;border-radius:18px;overflow:hidden;background:#2B2BFF;box-shadow:0 30px 80px -30px rgba(20,20,80,.55);cursor:pointer}
+canvas{display:block;width:100%;height:100%}
+.ctl{display:flex;align-items:center;gap:14px;margin-top:14px;padding:8px 10px;background:var(--bar);border-radius:999px}
+button{font:inherit;font-weight:600;border:0;border-radius:999px;background:var(--acc);color:#fff;padding:9px 20px;cursor:pointer;min-width:92px}
+button:focus-visible,input:focus-visible{outline:3px solid #FF3D9A;outline-offset:2px}
+input[type=range]{flex:1;accent-color:var(--acc);min-width:0}
+output{font-variant-numeric:tabular-nums;font-weight:500;min-width:84px;text-align:right}
+</style>
+<link rel="stylesheet" href="tabs.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+<main>
+  <div class="stage" id="stage" aria-label="Twenty second showreel: futuristic UX engineering, AI-agentic UX, custom skills, AI-human interactive design, design systems"><canvas id="c" width="1920" height="1080"></canvas></div>
+  <div class="ctl"><button id="pp" type="button">Pause</button><input id="sc" type="range" min="0" max="20" step="0.01" value="0" aria-label="Scrub timeline"><output id="tm">0.0 / 20.0s</output></div>
+</main>
+<script>
+const NAME="Venkatesh Ammireddy",ROLE="UX Creative Director × Product UX Architect × Design Engineer"; // edit me
+const W=1920,H=1080,DUR=20;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+{const _a=ctx.arc.bind(ctx),_e=ctx.ellipse.bind(ctx);ctx.arc=(x,y,r,...q)=>_a(x,y,Math.max(0,r||0),...q);ctx.ellipse=(x,y,rx,ry,...q)=>_e(x,y,Math.max(0,rx||0),Math.max(0,ry||0),...q)}
+const C={blue:'#2B2BFF',bone:'#ECE9FF',navy:'#0B0B2B',pink:'#FF3D9A',mint:'#7CFFD4',yel:'#FFD84A',white:'#fff'};
+const SANS='"Bricolage Grotesque",Helvetica,Arial,sans-serif',SERIF='"Instrument Serif",Georgia,serif';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),p=(t,a,b)=>clamp((t-a)/(b-a)),lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:x=>1-Math.pow(1-x,4),in:x=>x*x*x,expo:x=>x>=1?1:1-Math.pow(2,-10*x),io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,back:x=>{const c=1.70158,d=c+1;return 1+d*Math.pow(x-1,3)+c*Math.pow(x-1,2)}};
+function rr(x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+const bg=c=>{ctx.fillStyle=c;ctx.fillRect(0,0,W,H)};
+const circ=(x,y,r,c)=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,Math.max(0,r),0,7);ctx.fill()};
+function sparkle(x,y,r,col,rot=0){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=col;ctx.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4,q=i%2?r*.28:r;ctx.lineTo(Math.cos(a)*q,Math.sin(a)*q)}ctx.fill();ctx.restore()}
+let fc={};
+function fit(s,w,fam,it,mw,ms){const k=s+w+fam+it;if(!fc[k]){ctx.font=`${it?'italic ':''}${w} 100px ${fam}`;fc[k]=ctx.measureText(s).width}return Math.min(ms,100*mw/fc[k])}
+function T(s,x,y,size,col,o={}){const{w=800,f=SANS,it=false,al='left'}=o;ctx.font=`${it?'italic ':''}${w} ${size}px ${f}`;ctx.fillStyle=col;ctx.textAlign=al;ctx.textBaseline='alphabetic';ctx.fillText(s,x,y)}
+function R(s,x,y,size,col,k,o={}){const{w=800,f=SANS,it=false,stroke=null,al='left'}=o;ctx.save();ctx.beginPath();ctx.rect(0,y-size*.95,W,size*1.25);ctx.clip();
+  ctx.font=`${it?'italic ':''}${w} ${size}px ${f}`;ctx.textAlign=al;ctx.textBaseline='alphabetic';const yy=y+(1-k)*size*1.1;
+  if(stroke){ctx.lineWidth=3;ctx.strokeStyle=stroke;ctx.strokeText(s,x,yy)}else{ctx.fillStyle=col;ctx.fillText(s,x,yy)}ctx.restore()}
+function card(x,y,w,h,col,st,u,draw,r=44){
+  const k=E.back(p(u,st,st+.7));if(k<=.001)return;const cx=x+w/2,cy=y+h/2;ctx.save();ctx.translate(cx,cy);ctx.scale(k,k);ctx.translate(-cx,-cy);
+  ctx.globalAlpha=clamp(k*2);ctx.shadowColor='rgba(20,20,80,.25)';ctx.shadowBlur=50;ctx.shadowOffsetY=24;ctx.fillStyle=col;rr(x,y,w,h,r);ctx.fill();ctx.shadowColor='transparent';
+  rr(x,y,w,h,r);ctx.clip();draw(p(u,st+.3,st+1.3),x,y,w,h);ctx.restore();
+}
+
+/* ===== 1. Futuristic UX Engineering ===== */
+function s1(u){
+  bg(C.blue);T('AI-native UX engineering reel',120,118,52,C.bone,{it:true,f:SERIF,w:400});
+  const L=['Futuristic','UX','Engineering.'],ys=[400,640,880],sz=fit('Engineering.',800,SANS,false,1500,200);
+  L.forEach((s,i)=>R(s,120,ys[i],sz,i==2?C.mint:C.white,E.expo(p(u,.15+i*.2,.9+i*.2)),{stroke:i==1?C.white:null}));
+  ctx.font=`800 ${sz}px ${SANS}`;const w=ctx.measureText('Engineering.').width,k=E.back(p(u,1.2,1.7));
+  if(k>0)circ(120+w+80,ys[2]-60-Math.abs(Math.sin((u-1.2)*7))*130*Math.exp(-(u-1.2)*1.2),48*k,C.pink);
+  ctx.fillStyle=C.pink;ctx.fillRect(120,ys[2]+38,w*E.io(p(u,1.7,2.4)),12);
+  const sk=E.back(p(u,.5,1.2));sparkle(1650,300,120*sk,C.pink,u*1.4);
+  ctx.strokeStyle=C.mint;ctx.lineWidth=8;ctx.beginPath();ctx.arc(1650,300,(190+Math.sin(u*3)*10)*sk,0,7);ctx.stroke();
+  circ(1480,200,26*sk,C.white);
+}
+
+/* ===== 2. AI-Agentic UX ===== */
+const A2=[[C.blue,370],[C.pink,790],[C.mint,1210],[C.navy,1630]];
+function s2(u){
+  bg(C.bone);
+  const sz=fit('AI-Agentic UX',800,SANS,false,1300,140);R('AI-Agentic UX',120,190,sz,C.navy,E.expo(p(u,.05,.7)));
+  const bw=lerp(130,1100,E.expo(p(u,.2,.8))),bx=960-bw/2,full='make onboarding feel effortless';
+  ctx.save();ctx.shadowColor='rgba(20,20,80,.2)';ctx.shadowBlur=40;ctx.shadowOffsetY=16;ctx.fillStyle='#fff';rr(bx,265,bw,130,65);ctx.fill();ctx.restore();
+  sparkle(bx+75,330,32+6*Math.sin(u*6),C.blue,u*1.5);
+  if(bw>700){const n=Math.floor(p(u,.6,1.3)*full.length);T(full.slice(0,n),bx+135,346,44,C.navy,{w:500});
+    ctx.font=`500 44px ${SANS}`;const tw=ctx.measureText(full.slice(0,n)).width;if(u<1.5&&Math.floor(u*3)%2==0){ctx.fillStyle=C.pink;ctx.fillRect(bx+140+tw,300,4,58)}}
+  A2.forEach(([col,tx],i)=>{
+    const L=1.2+i*.14;
+    card(tx-190,520,380,360,[C.pink,C.blue,C.mint,C.navy][i],L+.5,u,(c,x,y,w,h)=>{
+      if(i==0){for(let j=0;j<6;j++){const k=E.out(p(c,j*.08,.6+j*.08)),bh=(h-120)*[.4,.7,.5,.9,.6,.8][j]*k;ctx.fillStyle=j==3?C.navy:C.white;rr(x+34+j*52,y+h-34-bh,34,bh,12);ctx.fill()}}
+      if(i==1){ctx.lineWidth=26;ctx.lineCap='round';ctx.strokeStyle='rgba(255,255,255,.2)';ctx.beginPath();ctx.arc(x+w/2,y+h/2,90,0,7);ctx.stroke();ctx.strokeStyle=C.mint;ctx.beginPath();ctx.arc(x+w/2,y+h/2,90,-1.57,-1.57+E.out(c)*4.9);ctx.stroke()}
+      if(i==2){for(let j=0;j<3;j++){const k=E.out(p(c,j*.15,.5+j*.15));circ(x+70,y+90+j*90,24*k,[C.blue,C.pink,C.navy][j]);ctx.fillStyle=C.navy;rr(x+120,y+78+j*90,(190-j*40)*k,24,12);ctx.fill()}}
+      if(i==3){sparkle(x+w/2,y+h/2-10,100*E.out(c),C.yel,c*2);sparkle(x+w-70,y+70,26*E.out(c),C.mint,c*3)}
+    });
+    const k=p(u,L,L+.6);if(k<=0||k>=1)return;
+    const sx=bx+75,cx=(sx+tx)/2+(i%2?-150:150);
+    for(let j=7;j>=0;j--){const e=E.io(clamp(k-j*.05));const x=(1-e)*(1-e)*sx+2*e*(1-e)*cx+e*e*tx,y=(1-e)*(1-e)*330+2*e*(1-e)*430+e*e*520;
+      ctx.globalAlpha=(1-j/8)*.8;circ(x,y,18*(1-j/10),col);if(!j){ctx.strokeStyle=C.navy;ctx.lineWidth=3;ctx.stroke()}}ctx.globalAlpha=1;
+  });
+}
+
+/* ===== 3. Customized Skills / Skill Make ===== */
+function s3(u){
+  bg(C.navy);const sz=fit('Customized Skills.',800,SANS,false,1500,112);
+  R('Customized Skills.',120,190,sz,C.white,E.expo(p(u,.1,.8)));R('Skill Make.',120,190+sz*1.15,sz,C.mint,E.expo(p(u,.3,1)));
+  const my=720,act=p(u,1.2,2.2)*(1-p(u,2.2,2.5)),sh=Math.sin(u*40)*5*act;
+  ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=4;ctx.setLineDash([14,14]);ctx.lineDashOffset=-u*60;ctx.beginPath();ctx.moveTo(0,my);ctx.lineTo(830,my);ctx.moveTo(1090,my);ctx.lineTo(1900,my);ctx.stroke();ctx.setLineDash([]);
+  [[C.pink,0],[C.white,1],[C.mint,2]].forEach(([c,i])=>{const k=E.io(p(u,.7+i*.28,1.8+i*.28)),x=lerp(-90,860,k),s=1-E.in(p(k,.85,1));if(s<=0)return;
+    ctx.save();ctx.translate(x,my);ctx.rotate(k*4+i);ctx.scale(s,s);ctx.fillStyle=c;
+    if(i==0){ctx.beginPath();ctx.arc(0,0,44,0,7);ctx.fill()}else if(i==1){rr(-40,-40,80,80,10);ctx.fill()}else{ctx.beginPath();ctx.moveTo(0,-48);ctx.lineTo(46,34);ctx.lineTo(-46,34);ctx.closePath();ctx.fill()}ctx.restore()});
+  const mk=E.back(p(u,.5,1.1));ctx.save();ctx.translate(960+sh,my);ctx.scale(mk*(1+.05*Math.sin(u*20)*act),mk);ctx.fillStyle=C.blue;rr(-130,-130,260,260,64);ctx.fill();sparkle(0,0,76,C.white,u*(1+4*act));ctx.restore();
+  [[C.pink,'bolt'],[C.mint,'star'],[C.white,'plus']].forEach(([c,g],i)=>{
+    const k=E.back(p(u,2.0+i*.2,2.7+i*.2));if(k<=0)return;const e=E.io(p(u,2.0+i*.2,2.7+i*.2)),x=lerp(1090,1330+i*220,e),y=my-Math.sin(e*Math.PI)*120;
+    ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle=c;rr(-85,-85,170,170,52);ctx.fill();ctx.fillStyle=C.navy;ctx.strokeStyle=C.navy;ctx.lineWidth=14;ctx.lineCap='round';
+    if(g=='bolt'){ctx.beginPath();ctx.moveTo(14,-50);ctx.lineTo(-24,6);ctx.lineTo(4,6);ctx.lineTo(-14,50);ctx.lineTo(28,-8);ctx.lineTo(0,-8);ctx.closePath();ctx.fill()}
+    if(g=='star')sparkle(0,0,50,C.navy,u*2);
+    if(g=='plus'){ctx.beginPath();ctx.moveTo(-36,0);ctx.lineTo(36,0);ctx.moveTo(0,-36);ctx.lineTo(0,36);ctx.stroke()}ctx.restore()});
+  T('skills, made to fit you',120,1000,52,C.mint,{it:true,f:SERIF,w:400});
+}
+
+/* ===== 4. Strategic AI-Native UX Engineering ===== */
+const RING='strategy + ai-native + ux + engineering + design + ';
+function s4(u){
+  bg(C.pink);const k=E.expo(p(u,0,.8));
+  const sz=fit('UX Engineering.',800,SANS,false,820,124);
+  ['Strategic','AI-Native','UX Engineering.'].forEach((s,i)=>R(s,120,360+i*sz*1.12,sz,C.navy,E.expo(p(u,.1+i*.2,.8+i*.2))));
+  T('Design × Engineering × AI',120,960,56,C.navy,{it:true,f:SERIF,w:400});
+  const cx=1360,cy=540,cols=[C.navy,C.blue,C.white,C.mint,C.yel];
+  for(let i=0;i<5;i++){const a=u*1.7+i*Math.PI*2/5,r=170*(.55+.45*Math.sin(u*2.2+i))*k;circ(cx+Math.cos(a)*r,cy+Math.sin(a)*r,(115+28*Math.sin(u*3+i))*k,cols[i])}
+  ctx.save();ctx.translate(cx,cy);ctx.rotate(-u*.55+E.out(p(u,0,1.2))*1.2);ctx.font=`600 44px ${SANS}`;ctx.fillStyle=C.navy;ctx.textBaseline='middle';
+  const Rr=420,str=RING.repeat(3);let tot=0;for(const ch of str)tot+=ctx.measureText(ch).width;const scl=(Math.PI*2*Rr)/tot;let acc=0;
+  for(const ch of str){const cw=ctx.measureText(ch).width,a=(acc+cw/2)*scl/Rr;acc+=cw;ctx.save();ctx.rotate(a);ctx.translate(0,-Rr);ctx.scale(scl,scl);ctx.textAlign='center';ctx.globalAlpha=E.out(p(u,.2,1));ctx.fillText(ch,0,0);ctx.restore()}
+  ctx.restore();
+}
+
+/* ===== 5. Future is AI-Human Interactive Design Experience ===== */
+function s5(u){
+  bg(C.blue);
+  const m=E.io(p(u,1.1,1.9)),hx=lerp(560,870,m),ax=lerp(1360,1050,m),vis=1-E.in(p(u,1.8,2.1)),en=E.back(p(u,.1,.7));
+  if(vis>0){
+    ctx.save();ctx.translate(hx,320);ctx.scale(en*vis,en*vis);circ(0,-30,62,C.pink);ctx.fillStyle=C.pink;ctx.beginPath();ctx.ellipse(0,120,112,100,0,Math.PI,0);ctx.fill();ctx.restore();
+    ctx.save();ctx.translate(ax,320);ctx.scale(en*vis,en*vis);sparkle(0,0,140,C.mint,u*1.2);circ(0,0,36,C.blue);ctx.restore();
+    ctx.strokeStyle='rgba(255,255,255,.5)';ctx.lineWidth=5;ctx.setLineDash([10,14]);ctx.lineDashOffset=-u*80;ctx.beginPath();ctx.moveTo(hx+130,300);ctx.lineTo(ax-150,300);ctx.stroke();ctx.setLineDash([]);
+    for(let j=0;j<3;j++){const s=((u*.9+j/3)%1);circ(lerp(hx+130,ax-150,s),300,10,j%2?C.pink:C.mint)}
+  }
+  const o=E.back(p(u,1.9,2.5));if(u>1.9){circ(960,320,120*o,C.white);sparkle(960,320,70*o,C.blue,u*2);
+    for(let j=0;j<2;j++){const ph=((u-1.9)*.8+j*.5)%1;ctx.strokeStyle=`rgba(255,255,255,${1-ph})`;ctx.lineWidth=6;ctx.beginPath();ctx.arc(960,320,130+ph*220,0,7);ctx.stroke()}
+    const bk=p(u,1.9,2.7);if(bk<1)for(let j=0;j<12;j++){const a=j*Math.PI/6,d=E.out(bk)*330;circ(960+Math.cos(a)*d,320+Math.sin(a)*d,14*(1-bk),[C.pink,C.mint,C.yel][j%3])}}
+  R('Future is',120,660,76,C.bone,E.expo(p(u,.3,1)),{it:true,f:SERIF,w:400});
+  R('AI-Human',120,850,fit('AI-Human',800,SANS,false,1500,210),C.white,E.expo(p(u,.5,1.2)));
+  R('Interactive Design Experience.',120,975,fit('Interactive Design Experience.',800,SANS,false,1500,84),C.mint,E.expo(p(u,.8,1.5)));
+}
+
+/* ===== 6a. Dynamic UX Design System ===== */
+function s6(u){
+  bg(C.mint);R('Dynamic UX Design System.',120,170,fit('Dynamic UX Design System.',800,SANS,false,1600,110),C.navy,E.expo(p(u,.05,.7)));
+  const pal=[C.navy,C.blue,C.pink,C.white];
+  for(let j=0;j<5;j++)for(let i=0;i<11;i++){
+    const d=Math.hypot(i-5,j-2),x=210+i*150,y=360+j*130,sc=E.back(p(u,d*.05,d*.05+.5));if(sc<=0)continue;
+    const mm=(Math.sin(u*4.2-d*.8)+1)/2,hit=j==Math.floor((u*4)%5)?1.15:1,half=44*(.62+.5*mm)*sc*hit;
+    ctx.save();ctx.translate(x,y);ctx.rotate(mm*Math.PI/2);ctx.fillStyle=pal[(i+j)%4];rr(-half,-half,half*2,half*2,lerp(half,10,mm));ctx.fill();ctx.restore()}
+  T('tokens, components, motion',120,1010,52,C.navy,{it:true,f:SERIF,w:400});
+}
+
+/* ===== 6b. Engineering Collaborative Design System ===== */
+function cursor(x,y,col,label,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.fillStyle=col;ctx.strokeStyle='#fff';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,56);ctx.lineTo(16,43);ctx.lineTo(28,70);ctx.lineTo(40,64);ctx.lineTo(28,38);ctx.lineTo(48,36);ctx.closePath();ctx.stroke();ctx.fill();
+  ctx.font=`700 28px ${SANS}`;const w=ctx.measureText(label).width+40;ctx.fillStyle=col;rr(30,72,w,48,24);ctx.fill();T(label,50,105,28,col==C.mint?C.navy:'#fff',{w:700});ctx.restore()}
+function s7(u){
+  bg(C.bone);const sz=fit('Design System.',800,SANS,false,760,112);
+  ['Engineering','Collaborative','Design System.'].forEach((s,i)=>R(s,120,230+i*sz*1.12,sz,C.navy,E.expo(p(u,.05+i*.15,.7+i*.15))));
+  const k=E.back(p(u,.3,.9)),cw=lerp(560,660,(Math.sin(u*2)+1)/2),rad=lerp(24,110,(Math.sin(u*3.2)+1)/2),x=1330-cw/2,y=340;
+  ctx.save();ctx.translate(1330,540);ctx.scale(Math.max(k,0),Math.max(k,0));ctx.translate(-1330,-540);
+  ctx.shadowColor='rgba(20,20,80,.25)';ctx.shadowBlur=50;ctx.shadowOffsetY=24;ctx.fillStyle='#fff';rr(x,y,cw,400,rad);ctx.fill();ctx.shadowColor='transparent';
+  circ(x+64,y+64,28,C.blue);ctx.fillStyle='#E3E0FA';rr(x+110,y+48,190,18,9);ctx.fill();rr(x+110,y+76,120,14,7);ctx.fill();
+  ctx.fillStyle=[C.pink,C.blue,C.mint][Math.floor(u*1.5)%3];rr(x+40,y+130,cw-80,120,Math.min(rad,50));ctx.fill();
+  ctx.fillStyle=[C.blue,C.pink,C.navy][Math.floor(u*1.5)%3];rr(x+40,y+290,220,70,35);ctx.fill();
+  ctx.fillStyle=C.navy;[[x+cw,y+400],[x,y+400]].forEach(([hx,hy])=>{ctx.fillRect(hx-9,hy-9,18,18)});ctx.restore();
+  const dx=1330+cw/2+10+Math.sin(u*2.5)*40,dy=740+Math.cos(u*2.1)*30,ex=1260+Math.cos(u*2.2)*60,ey=640+Math.sin(u*2.6)*40,ck=E.back(p(u,.9,1.4));
+  ctx.strokeStyle=C.navy;ctx.lineWidth=3;ctx.setLineDash([8,10]);ctx.lineDashOffset=-u*50;ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(ex,ey);ctx.stroke();ctx.setLineDash([]);
+  const s=(u*.9)%1;circ(lerp(dx,ex,s),lerp(dy,ey,s),9*Math.max(ck,0),C.navy);
+  cursor(dx,dy,C.pink,'Design',Math.max(ck,0));cursor(ex,ey,C.blue,'Engineering',Math.max(ck,0));
+}
+
+/* ===== 7. Lockup ===== */
+function s8(u){
+  bg(C.navy);
+  const ns=fit(NAME,800,SANS,false,1600,150);R(NAME,960,470,ns,C.white,E.expo(p(u,.1,.8)),{al:'center'});
+  const rs=fit(ROLE,400,SERIF,true,1500,60);R(ROLE,960,590,rs,C.bone,E.expo(p(u,.4,1.1)),{al:'center',it:true,f:SERIF,w:400});
+  R('AI-native UX engineering.',960,700,46,C.mint,E.expo(p(u,.6,1.3)),{al:'center'});
+  const sk=E.back(p(u,.3,1));sparkle(300,300,110*sk,C.pink,u*1.4);sparkle(1650,800,70*sk,C.mint,-u*1.4);
+  circ(1560,260,30*sk,C.yel);ctx.strokeStyle=C.blue;ctx.lineWidth=10;ctx.beginPath();ctx.arc(340,820,70*sk+Math.sin(u*3)*6,0,7);ctx.stroke();
+  const bk=E.back(p(u,.8,1.3));circ(1480,380,22*bk,C.pink);
+}
+
+const S=[0,2.6,5.6,8.4,11.2,14.0,15.8,18.0,20],F=[s1,s2,s3,s4,s5,s6,s7,s8],ORG=[[960,540],[1920,0],[0,1080],[1920,1080],[960,540],[0,0],[1920,540],[960,1080]];
+function render(t){
+  let i=S.findIndex((s,j)=>t>=s&&t<S[j+1]);if(i<0)i=7;const u=t-S[i],tr=p(u,0,.6);
+  if(i>0&&tr<1){F[i-1](S[i]-S[i-1]);ctx.save();ctx.beginPath();ctx.arc(ORG[i][0],ORG[i][1],E.io(tr)*1500,0,7);ctx.clip();F[i](u);ctx.restore()}else F[i](u);
+  const fo=E.io(p(t,19.55,20));if(fo>0){ctx.fillStyle=`rgba(11,11,43,${fo})`;ctx.fillRect(0,0,W,H)}
+}
+/* ===== player ===== */
+const pp=document.getElementById('pp'),sl=document.getElementById('sc'),tm=document.getElementById('tm');
+let t=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing){t+=dt;if(t>=DUR)t=0}render(t);pp.textContent=playing?'Pause':'Play';sl.value=t;tm.textContent=t.toFixed(1)+' / 20.0s';requestAnimationFrame(loop)}
+pp.onclick=()=>{playing=!playing};document.getElementById('stage').onclick=()=>{playing=!playing};
+sl.oninput=()=>{t=parseFloat(sl.value)};
+addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();playing=!playing}});
+const go=()=>{fc={};last=performance.now();requestAnimationFrame(loop)};
+Promise.race([Promise.all([document.fonts.load('800 100px "Bricolage Grotesque"'),document.fonts.load('600 100px "Bricolage Grotesque"'),document.fonts.load('500 100px "Bricolage Grotesque"'),document.fonts.load('italic 400 50px "Instrument Serif"')]),new Promise(r=>setTimeout(r,2500))]).then(go,go);
+</script>
+<script src="tabs.js" defer></script>
+</body>
+</html>

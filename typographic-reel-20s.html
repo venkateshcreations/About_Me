@@ -1,0 +1,219 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- PT-SEO -->
+<meta name="description" content="A 20-second type-only motion identity in vertical 4:5: from screens to systems, by Venkatesh Ammireddy." />
+<link rel="canonical" href="https://venkateshcreations.github.io/About_Me/typographic-reel-20s.html" />
+<meta name="theme-color" content="#0b0b0e" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://venkateshcreations.github.io/About_Me/typographic-reel-20s.html" />
+<meta property="og:title" content="Typographic Reel (20s) — Venkatesh Ammireddy | Screens to Systems" />
+<meta property="og:description" content="A 20-second type-only motion identity in vertical 4:5: from screens to systems, by Venkatesh Ammireddy." />
+<meta property="og:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="Typographic Reel (20s) — Venkatesh Ammireddy | Screens to Systems" />
+<meta property="twitter:description" content="A 20-second type-only motion identity in vertical 4:5: from screens to systems, by Venkatesh Ammireddy." />
+<meta property="twitter:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Typographic Reel (20s) — Venkatesh Ammireddy | Screens to Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;500;600;800;900&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDEDED;--fg:#000;--bar:#fff;--acc:#111;--bf:#fff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A0A0A;--fg:#fff;--bar:#171717;--acc:#F2F2F2;--bf:#000}}
+:root[data-theme="dark"]{--bg:#0A0A0A;--fg:#fff;--bar:#171717;--acc:#F2F2F2;--bf:#000}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:"Inter Tight",system-ui,Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center}
+main{width:min(100vw,calc((100vh - 96px) * 4 / 5));padding:12px}
+.stage{aspect-ratio:4/5;width:100%;border-radius:18px;overflow:hidden;background:#000;box-shadow:0 30px 80px -30px rgba(0,0,0,.6);cursor:pointer}
+canvas{display:block;width:100%;height:100%}
+.ctl{display:flex;align-items:center;gap:14px;margin-top:14px;padding:8px 10px;background:var(--bar);border-radius:999px}
+button{font:inherit;font-weight:600;border:0;border-radius:999px;background:var(--acc);color:var(--bf);padding:9px 20px;cursor:pointer;min-width:92px}
+button:focus-visible,input:focus-visible{outline:3px solid #A259FF;outline-offset:2px}
+input[type=range]{flex:1;accent-color:var(--acc);min-width:0}
+output{font-variant-numeric:tabular-nums;font-weight:600;min-width:84px;text-align:right}
+</style>
+<link rel="stylesheet" href="tabs.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+<main>
+  <div class="stage" id="stage" aria-label="Twenty second typographic motion reel in 4:5 format: from screens to systems"><canvas id="c" width="1080" height="1350"></canvas></div>
+  <div class="ctl"><button id="pp" type="button">Pause</button><input id="sc" type="range" min="0" max="20" step="0.01" value="0" aria-label="Scrub timeline"><output id="tm">0.0 / 20.0s</output></div>
+</main>
+<script>
+const NAME="Venkatesh Ammireddy",ROLE="UX Creative Director × Product UX Architect × Design Engineer"; // edit me
+const W=1080,H=1350,DUR=20,FPS=30;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const F={red:'#F24E1E',or:'#FF7262',yel:'#FFC93C',gr:'#0ACF83',teal:'#00BFD8',bl:'#1ABCFE',ind:'#5B6CFF',pu:'#A259FF',pink:'#FF4D8D'},FC=[F.red,F.or,F.yel,F.gr,F.teal,F.bl,F.ind,F.pu,F.pink];
+const D='"Inter Tight","Helvetica Neue",Arial,sans-serif',SER='"Instrument Serif",Georgia,serif';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),p=(t,a,b)=>clamp((t-a)/(b-a)),lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:x=>1-Math.pow(1-x,4),in:x=>x*x*x,io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,expo:x=>x>=1?1:1-Math.pow(2,-10*x),back:x=>{const c=1.70158,d=c+1;return 1+d*Math.pow(x-1,3)+c*Math.pow(x-1,2)}};
+const hx=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+const mix=(a,b,k)=>{const A=hx(a),B=hx(b);return`rgb(${A.map((v,i)=>Math.round(lerp(v,B[i],clamp(k)))).join(',')})`};
+/* ---- type engine ---- */
+let cwc={};
+const fnt=(w,f,it,s)=>`${it?'italic ':''}${w} ${s}px ${f}`;
+const cw=(ch,w,f,it)=>{const k=f+w+it+ch;if(cwc[k]===undefined){ctx.font=fnt(w,f,it,100);cwc[k]=ctx.measureText(ch).width/100}return cwc[k]};
+const lw=(l,s,tr,w,f,it)=>{let a=0,n=0;for(const ch of l){a+=cw(ch,w,f,it)*s;n++}return a+tr*s*(n-1)};
+const fit=(L,tr,w,f,mw,ms,it)=>{let m=1;for(const x of[].concat(L))m=Math.max(m,lw(x,100,tr,w,f,it));return Math.min(ms,100*mw/m)};
+function glyph(ch,cx,cy,s){
+  if(s.a<=.004)return;const G=ctx.globalAlpha;
+  const d=(ox,al,col,comp)=>{ctx.save();ctx.globalAlpha=clamp(al)*G;if(comp)ctx.globalCompositeOperation=comp;ctx.translate(cx+(s.dx||0)+ox,cy+(s.dy||0));ctx.rotate(s.rot||0);const k=s.sc||1;ctx.scale(k,k*(s.sy===undefined?1:s.sy));ctx.fillStyle=col;ctx.fillText(ch,0,0);ctx.restore()};
+  if(s.split){d(-s.split,s.a*.7,F.red,'lighter');d(s.split,s.a*.7,F.bl,'lighter')}
+  if(s.bx){d(s.bx,s.a*.16,s.col||'#fff');d(s.bx*.5,s.a*.28,s.col||'#fff')}
+  d(0,s.a,s.col||'#fff');
+}
+function put(L,o,fn){
+  const{x,y,size,tr=0,w=800,al='c',lh=1,f=D,it=false}=o;
+  ctx.font=fnt(w,f,it,size);ctx.textAlign='center';ctx.textBaseline='middle';
+  const ws=L.map(l=>lw(l,size,tr,w,f,it)),mx=Math.max(...ws);let gi=0;
+  L.forEach((l,li)=>{const c=[...l];let cur=al==='c'?x-ws[li]/2:x;const yy=y+li*size*lh;
+    c.forEach((ch,i)=>{const wd=cw(ch,w,f,it)*size,cx=cur+wd/2;cur+=wd+tr*size;if(ch!==' ')glyph(ch,cx,yy,fn({li,i,n:c.length,gi,ch,cx}));gi++})});
+  return{x0:al==='c'?x-mx/2:x,w:mx};
+}
+function arrow(x1,y,x2,lwid,col,k){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=lwid;ctx.lineCap='round';ctx.lineJoin='round';const x=lerp(x1,x2,k),h=lwid*2.6;
+  ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x,y);if(k>.9){ctx.moveTo(x2-h,y-h);ctx.lineTo(x2,y);ctx.lineTo(x2-h,y+h)}ctx.stroke();ctx.restore()}
+function rr(x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+
+/* ===== 1. FROM SCREENS -> TO SYSTEMS (letter roll) ===== */
+function s1(t){
+  ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  [[F.pink,1.75],[F.yel,1.9],[F.pu,2.05]].forEach(([c,s0])=>{ctx.fillStyle=c;ctx.beginPath();ctx.arc(W/2,H*.47,E.io(p(t,s0,s0+1))*1500,0,7);ctx.fill()});
+  const z=1+.04*p(t,0,3.3);ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
+  const A='SCREENS',B='SYSTEMS',size=fit([A],0,900,D,840,250),y=H*.47,gap=size*.02;
+  const ws=[...A].map((a,i)=>Math.max(cw(a,900,D,false),cw(B[i],900,D,false))*size),tot=ws.reduce((a,b)=>a+b,0)+gap*6;
+  const fk=E.expo(p(t,.5,1.1)),fm=E.io(p(t,1.7,2.5));
+  ctx.save();ctx.globalAlpha=fk;ctx.strokeStyle='#fff';ctx.lineWidth=5;rr(W/2-tot/2-40,y-size*.64,tot+80,size*1.28,lerp(26,size*.64,fm));ctx.stroke();ctx.restore();
+  put(['FROM'],{x:90,y:y-size*.64-80,size:48,tr:.3,w:600,al:'l'},g=>{const k=E.expo(clamp((t-.2-g.gi*.04)/.5));return{a:k,dy:(1-k)*30}});
+  ctx.save();ctx.beginPath();ctx.rect(0,y-size*.64,W,size*1.28);ctx.clip();ctx.font=fnt(900,D,false,size);ctx.textAlign='center';ctx.textBaseline='middle';
+  let x=W/2-tot/2;
+  [...A].forEach((a,i)=>{const k=E.expo(p(t,1.9+i*.07,2.6+i*.07)),n=E.expo(p(t,.3+i*.05,.9+i*.05)),cx=x+ws[i]/2;x+=ws[i]+gap;
+    glyph(a,cx,y,{a:n*(1-k),dy:(1-n)*size*.8-k*size*1.2});glyph(B[i],cx,y,{a:k,dy:(1-k)*size*1.2})});
+  ctx.restore();
+  const ay=y+size*.64+120,ak=E.io(p(t,1.3,1.9));arrow(90,ay,450,8,F.yel,ak);
+  put(['TO'],{x:490,y:ay,size:84,w:800,al:'l'},g=>{const k=E.expo(clamp((t-1.8-g.gi*.05)/.4));return{a:k,dx:(1-k)*-40,col:F.yel}});
+  ctx.restore();
+}
+
+/* ===== 2. OLD PROCESS: slow, light, heavy ===== */
+const WD=['Idea','Wireframe','UI','Prototype','Handoff','Engineering'],TS=[3.7,4.25,4.8,5.35,5.9,6.7],WY=i=>350+i*135;
+function s2(t){
+  const u=t-3.2;ctx.fillStyle='#E9E9E9';ctx.fillRect(0,0,W,H);
+  const z=1+.03*p(t,3.2,7.7);ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
+  put(['OLD PROCESS'],{x:90,y:150,size:fit(['OLD PROCESS'],0,900,D,900,80),w:900,al:'l'},g=>{const k=E.out(clamp((u-.1-g.gi*.04)/.8));return{a:k,dy:(1-k)*30,col:'#111'}});
+  {const bw=lw('Traditional Slow Design:',40,.02,300,D);ctx.fillStyle=F.yel;rr(76,194,(bw+28)*E.out(p(u,.3,.9)),56,10);ctx.fill()}
+  put(['Traditional Slow Design:'],{x:90,y:222,size:40,w:300,al:'l',tr:.02},g=>({a:E.out(clamp((u-.5-g.gi*.02)/.8)),col:'#111'}));
+  let ly=0;for(let i=1;i<6;i++)ly+=135*E.io(p(t,TS[i]-.35,TS[i]));
+  if(t>TS[0]){ctx.strokeStyle='#BDBDBD';ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(62,WY(0));ctx.lineTo(62,WY(0)+ly);ctx.stroke();
+    WD.forEach((_,i)=>{const k=E.back(p(t,TS[i]-.1,TS[i]+.3));if(k>0){ctx.fillStyle=FC[i];ctx.beginPath();ctx.arc(62,WY(i),13*k,0,7);ctx.fill()}});
+    ctx.strokeStyle='#111';ctx.lineWidth=4;ctx.beginPath();ctx.arc(62,WY(0)+ly,21,0,7);ctx.stroke()}
+  WD.forEach((w,i)=>{
+    put([w],{x:110,y:WY(i),size:120,w:300,al:'l',tr:lerp(0,.05,E.out(p(t,TS[i],TS[i]+1.4)))},g=>{
+      const k=E.out(clamp((t-TS[i]-g.i*.05)/.5)),dim=i<5?E.io(p(t,TS[i+1],TS[i+1]+.5)):0,cr=i==4?E.out(p(t,6.1,6.35)):0;
+      return{a:k,dy:(1-k)*24+(i==4?(g.i%2?1:-1)*cr*16:0),col:mix('#111111','#A0A0A0',dim)}});
+  });
+  const cr=E.out(p(t,6.1,6.35));if(cr>0){ctx.strokeStyle=`rgba(242,78,30,${.55+.45*Math.sin(t*14)})`;ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(110,WY(4)+66);ctx.lineTo(110+860*cr,WY(4)+66);ctx.stroke()}
+  ctx.restore();
+}
+
+/* ===== 4. NEW PROCESS: hi-speed word cards, justified stack ===== */
+const LBL=[['Context'],['Rules'],['AI Agentic','Implementation'],['Live','Interface'],['Test'],['Iterate'],['Engineering']];
+const CBG=[F.bl,F.pu,F.red,F.gr,F.yel,F.pink,F.ind],CFG=['#000','#fff','#fff','#000','#000','#000','#fff'];
+function card(i,tc){
+  const k=E.expo(clamp(tc/.3));ctx.save();ctx.beginPath();const m=i%3;
+  if(m==0)ctx.rect(0,0,W*k,H);else if(m==1)ctx.rect(0,H*(1-k),W,H*k+1);else ctx.arc(W/2,H/2,k*1100,0,7);ctx.clip();
+  ctx.fillStyle=CBG[i];ctx.fillRect(0,0,W,H);
+  const L=LBL[i],size=fit(L,0,900,D,880,i==2?150:330),e=E.expo(clamp((tc-.04)/.32));
+  put(L,{x:W/2,y:H/2-(L.length-1)*size*.48,size,w:900,lh:.96},g=>{
+    const st={a:clamp(e*3),col:CFG[i]};
+    switch(i){case 0:st.dx=(1-e)*W*.6;st.bx=(1-e)*160;break;case 1:st.sc=lerp(3,1,e);break;case 2:st.dy=-(1-e)*H*.4-(g.gi%2?30:0);break;
+      case 3:st.sy=Math.cos((1-e)*1.4);break;case 4:st.dy=(1-E.expo(clamp((tc-.04-g.i*.03)/.3)))*size;break;case 5:st.rot=(1-e)*-.5;st.sc=lerp(.6,1,e);break;case 6:st.sc=lerp(1.6,1,e);st.bx=(1-e)*60}
+    return st});
+  ctx.restore();
+}
+function s4(t){
+  const u=t-7.8;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  const hs=fit(['NEW PROCESS'],0,900,D,900,170);
+  put(['NEW PROCESS'],{x:90,y:560,size:hs,w:900,al:'l'},g=>{const k=E.expo(clamp((u-.05-g.gi*.03)/.5)),ex=E.in(clamp((u-1+g.gi*0-.0)/.3));return{a:k*(1-ex),dy:(1-k)*80-ex*260,col:FC[g.i%FC.length],split:(1-k)*14}});
+  put(['AI-native Hi-Speed Design:'],{x:90,y:560+hs*.85,size:46,w:500,al:'l',tr:.01},g=>{const k=E.expo(clamp((u-.35-g.gi*.012)/.5)),ex=E.in(clamp((u-1)/.3));return{a:k*(1-ex),dy:(1-k)*30-ex*260,col:F.yel}});
+  for(let i=0;i<7;i++){const c0=1+i*.44,tc=u-c0;if(tc>=0&&(i==6||u<c0+.44+.4)&&u<4.3)card(i,tc)}
+  if(u>=4){
+    ctx.save();ctx.beginPath();ctx.arc(W/2,H/2,E.expo(p(u,4,4.35))*1500,0,7);ctx.clip();ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+    const sz=LBL.map(l=>fit([l.join(' ')],0,900,D,900,150)),tot=sz.reduce((a,b)=>a+b*.98,0);let y=(H-tot)/2;
+    const hl=u>5?Math.floor(((u-5)*8)%7):-1;
+    LBL.forEach((l,j)=>{const s=sz[j],yy=y+s*.5;y+=s*.98;const st=4.1+j*.09,ex=E.in(p(u,5.45+j*.03,5.75+j*.03));
+      put([l.join(' ')],{x:90,y:yy,size:s,w:900,al:'l'},g=>{const k=E.expo(clamp((u-st-g.i*.006)/.3));return{a:k,dx:(j%2?1:-1)*(1-k)*W*.5-ex*W,col:hl==j?'#fff':FC[j%FC.length],bx:(1-k)*80}})});
+    ctx.restore();
+  }
+}
+
+/* ===== 5. The difference is significant (type race) ===== */
+function row(words,y,size,w,speed,t,cols,al){
+  ctx.save();ctx.globalAlpha*=al;ctx.font=fnt(w,D,false,size);ctx.textAlign='left';ctx.textBaseline='middle';
+  const gap=size*.8;let tot=0;const ms=words.map(s=>{const m=ctx.measureText(s).width;tot+=m+gap;return m});
+  const off=-((t*speed)%tot);for(let rep=0;rep<3;rep++){let x=off+rep*tot;words.forEach((s,i)=>{ctx.fillStyle=cols[i%cols.length];ctx.fillText(s,x,y);x+=ms[i]+gap})}ctx.restore();
+}
+function s5(t){
+  const u=t-13.3;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  const z=1+.05*p(t,13.3,17);ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
+  const a1=E.out(p(u,.1,.6));
+  put(['OLD PROCESS'],{x:90,y:210,size:30,w:600,al:'l',tr:.3},()=>({a:a1,col:'#8C8C8C'}));
+  row(['Idea','Wireframe','UI','Prototype','Handoff','Engineering'],290,80,300,45,t,['#8C8C8C'],a1);
+  put(['NEW PROCESS'],{x:90,y:1000,size:30,w:600,al:'l',tr:.3},()=>({a:a1,col:F.gr}));
+  row(['Context','Rules','AI Agentic Implementation','Live Interface','Test','Iterate','Engineering'],1100,110,900,1500,t,FC,a1*.35);
+  row(['Context','Rules','AI Agentic Implementation','Live Interface','Test','Iterate','Engineering'],1100,110,900,1400,t,FC,a1);
+  const s1=fit(['The difference'],0,400,SER,880,150,true),s2=fit(['is significant.'],0,900,D,880,130);
+  put(['The difference'],{x:W/2,y:590,size:s1,w:400,f:SER,it:true},g=>{const k=E.expo(clamp((u-.2-g.gi*.03)/.5));return{a:k,dy:(1-k)*70}});
+  {const ly=590+s1*.62+s2*.5,bw=lw('is significant.',s2,0,900,D)+70,k=E.out(p(u,.5,1));ctx.fillStyle=F.yel;rr(W/2-bw*k/2,ly-s2*.58,bw*k,s2*1.16,16);ctx.fill()}
+  put(['is significant.'],{x:W/2,y:590+s1*.62+s2*.5,size:s2,w:900},g=>{const k=E.expo(clamp((u-.6-g.gi*.03)/.35));return{a:k,sc:lerp(2.4,1,k),col:'#000'}});
+  ctx.restore();
+}
+
+/* ===== 6. Behaviour statement + lockup ===== */
+function s6(t){
+  const u=t-16.3;ctx.fillStyle='#000';ctx.fillRect(0,0,W,H);
+  const z=1+.04*p(t,16.3,20);ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
+  const L1=['No longer designing','only what the','interface looks like.'],s1=fit(L1,0,400,SER,880,86,true),dim=E.io(p(u,1,1.4));
+  put(L1,{x:W/2,y:lerp(330,250,dim),size:s1,w:400,f:SER,it:true,lh:1.05},g=>{const k=E.expo(clamp((u+.1-g.gi*.012)/.5));return{a:k*(1-.65*dim),dy:(1-k)*30,col:'#fff'}});
+  const L2=['I will define','how the interface','behaves.'],sz=L2.map((l,j)=>fit([l],0,900,D,880,j==2?250:140));let y=lerp(560,520,1);
+  const sw=lerp(-200,W+200,E.io(p(u,1.9,2.6)));
+  L2.forEach((l,j)=>{const s=sz[j],yy=y+s*.5;y+=s*.96;
+    put([l],{x:W/2,y:yy,size:s,w:900},g=>{const k=E.expo(clamp((u-1-j*.25-g.i*.02)/.45)),b=Math.max(0,1-Math.abs(g.cx-sw)/160);
+      return{a:k,dy:(1-k)*s*.6,sc:lerp(1.3,1,k),col:j==2?mix(FC[g.i%FC.length],'#FFFFFF',b):j==0?F.yel:F.teal,split:(1-k)*16}})});
+  const na=E.out(p(u,2.1,2.7));
+  put([NAME],{x:W/2,y:1130,size:58,w:800},g=>({a:na,dy:(1-na)*20}));
+  const rs=fit([ROLE],0,500,D,900,28);
+  put([ROLE],{x:W/2,y:1195,size:rs,w:500},g=>({a:E.out(clamp((u-2.4-g.gi*.01)/.4)),col:g.ch==='×'?F.or:'#9A9A9A'}));
+  FC.forEach((c,i)=>{const k=E.out(p(u,2.4+i*.05,2.9+i*.05)),sw9=900/FC.length;ctx.fillStyle=c;ctx.fillRect(90+i*sw9,1262,sw9*k,12)});
+  ctx.restore();
+}
+
+/* ===== compositor ===== */
+function draw(t){
+  const q=Math.min(DUR*FPS-1,Math.floor(t*FPS+1e-6))/FPS;ctx.setTransform(1,0,0,1,0,0);ctx.globalAlpha=1;
+  if(q<3.7)s1(q);
+  if(q>=3&&q<7.8){ctx.save();const k=p(q,3,3.6);if(k<1){ctx.beginPath();for(let b=0;b<12;b++){const r=E.out(p(k,b*.04,b*.04+.5));ctx.rect(0,b*H/12,W*r,H/12+1)}ctx.clip()}s2(q);ctx.restore()}
+  if(q>=7.8&&q<13.9)s4(q);
+  if(q>=7&&q<8.7)for(let i=0;i<9;i++){const g=E.out(p(q,7+i*.035,7.45+i*.035)),sh=E.io(p(q,7.9+i*.035,8.3+i*.035));ctx.fillStyle=FC[i];ctx.fillRect(i*W/9,H*sh,W/9+1,H*(g-sh))}
+  if(q>=13.2&&q<17.1){ctx.save();const k=p(q,13.2,13.9);if(k<1){ctx.beginPath();ctx.arc(W/2,H,E.io(k)*1900,0,7);ctx.clip()}s5(q);ctx.restore()}
+  if(q>=16.3){ctx.save();const k=p(q,16.3,17);if(k<1){ctx.beginPath();ctx.arc(W/2,H/2,E.io(k)*1300,0,7);ctx.clip()}s6(q);ctx.restore()}
+  const fo=E.io(p(q,19.5,19.95));if(fo>0){ctx.fillStyle=`rgba(0,0,0,${fo})`;ctx.fillRect(0,0,W,H)}
+}
+
+/* ===== player ===== */
+const pp=document.getElementById('pp'),sl=document.getElementById('sc'),tm=document.getElementById('tm');
+let t=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=performance.now();
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing){t+=dt;if(t>=DUR)t=0}draw(t);pp.textContent=playing?'Pause':'Play';sl.value=t;tm.textContent=t.toFixed(1)+' / 20.0s';requestAnimationFrame(loop)}
+pp.onclick=()=>{playing=!playing};document.getElementById('stage').onclick=()=>{playing=!playing};
+sl.oninput=()=>{t=parseFloat(sl.value)};
+addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();playing=!playing}});
+const go=()=>{cwc={};last=performance.now();requestAnimationFrame(loop)};
+Promise.race([Promise.all([document.fonts.load('900 100px "Inter Tight"'),document.fonts.load('800 100px "Inter Tight"'),document.fonts.load('300 100px "Inter Tight"'),document.fonts.load('500 100px "Inter Tight"'),document.fonts.load('600 100px "Inter Tight"'),document.fonts.load('italic 400 100px "Instrument Serif"')]),new Promise(r=>setTimeout(r,2500))]).then(go,go);
+</script>
+<script src="tabs.js" defer></script>
+</body>
+</html>

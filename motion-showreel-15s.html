@@ -1,0 +1,218 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- PT-SEO -->
+<meta name="description" content="15 seconds of kinetic type, AI-native UX, living design systems and art direction by UX Creative Director Venkatesh Ammireddy." />
+<link rel="canonical" href="https://venkateshcreations.github.io/About_Me/motion-showreel-15s.html" />
+<meta name="theme-color" content="#0b0b0e" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://venkateshcreations.github.io/About_Me/motion-showreel-15s.html" />
+<meta property="og:title" content="Motion Showreel (15s) — Venkatesh Ammireddy | UX & Creative Direction" />
+<meta property="og:description" content="15 seconds of kinetic type, AI-native UX, living design systems and art direction by UX Creative Director Venkatesh Ammireddy." />
+<meta property="og:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="Motion Showreel (15s) — Venkatesh Ammireddy | UX & Creative Direction" />
+<meta property="twitter:description" content="15 seconds of kinetic type, AI-native UX, living design systems and art direction by UX Creative Director Venkatesh Ammireddy." />
+<meta property="twitter:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Motion Showreel (15s) — Venkatesh Ammireddy | UX & Creative Direction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEEBFF;--fg:#0B0B2B;--bar:#fff;--acc:#2B2BFF;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07071C;--fg:#EEEBFF;--bar:#15153A;--acc:#8C8CFF}}
+:root[data-theme="dark"]{--bg:#07071C;--fg:#EEEBFF;--bar:#15153A;--acc:#8C8CFF}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font-family:"Bricolage Grotesque",system-ui,Helvetica,Arial,sans-serif;display:flex;align-items:center;justify-content:center}
+main{width:min(100vw,calc((100vh - 90px) * 16 / 9));padding:12px}
+.stage{aspect-ratio:16/9;width:100%;border-radius:18px;overflow:hidden;background:#2B2BFF;box-shadow:0 30px 80px -30px rgba(20,20,80,.55);cursor:pointer}
+canvas{display:block;width:100%;height:100%}
+.ctl{display:flex;align-items:center;gap:14px;margin-top:14px;padding:8px 10px;background:var(--bar);border-radius:999px}
+button{font:inherit;font-weight:600;border:0;border-radius:999px;background:var(--acc);color:#fff;padding:9px 20px;cursor:pointer;min-width:92px}
+button:focus-visible,input:focus-visible{outline:3px solid #FF3D9A;outline-offset:2px}
+input[type=range]{flex:1;accent-color:var(--acc);min-width:0}
+output{font-variant-numeric:tabular-nums;font-weight:500;min-width:84px;text-align:right}
+</style>
+<link rel="stylesheet" href="tabs.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+<main>
+  <div class="stage" id="stage" aria-label="Motion design showreel, 15 seconds"><canvas id="c" width="1920" height="1080"></canvas></div>
+  <div class="ctl">
+    <button id="pp" type="button">Pause</button>
+    <input id="sc" type="range" min="0" max="15" step="0.01" value="0" aria-label="Scrub timeline">
+    <output id="tm">0.0 / 15.0s</output>
+  </div>
+</main>
+<script>
+const NAME="Venkatesh.A"; // edit me
+const W=1920,H=1080,DUR=15;
+const cv=document.getElementById('c'),ctx=cv.getContext('2d');
+const C={blue:'#2B2BFF',bone:'#ECE9FF',navy:'#0B0B2B',pink:'#FF3D9A',mint:'#7CFFD4',white:'#FFFFFF'};
+const SANS='"Bricolage Grotesque",Helvetica,Arial,sans-serif',SERIF='"Instrument Serif",Georgia,serif';
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x));
+const p=(t,a,b)=>clamp((t-a)/(b-a));
+const lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:x=>1-Math.pow(1-x,4),expo:x=>x>=1?1:1-Math.pow(2,-10*x),io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,
+  back:x=>{const c=1.70158,d=c+1;return 1+d*Math.pow(x-1,3)+c*Math.pow(x-1,2)}};
+function rr(x,y,w,h,r){r=Math.min(r,w/2,h/2);ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function txt(s,x,y,font,col,al='left'){ctx.font=font;ctx.fillStyle=col;ctx.textAlign=al;ctx.textBaseline='alphabetic';ctx.fillText(s,x,y)}
+function bg(c){ctx.fillStyle=c;ctx.fillRect(0,0,W,H)}
+// masked rise: text slides up from behind a baseline mask
+function rise(s,x,y,size,font,fill,k,stroke){
+  ctx.save();ctx.beginPath();ctx.rect(0,y-size*.95,W,size*1.2);ctx.clip();
+  ctx.font=font;ctx.textAlign='left';ctx.textBaseline='alphabetic';
+  const yy=y+(1-k)*size*1.1;
+  if(stroke){ctx.lineWidth=3;ctx.strokeStyle=stroke;ctx.strokeText(s,x,yy)}else{ctx.fillStyle=fill;ctx.fillText(s,x,yy)}
+  ctx.restore();
+}
+function sparkle(x,y,r,col,rot=0){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle=col;ctx.beginPath();
+  for(let i=0;i<8;i++){const a=i*Math.PI/4,rad=i%2?r*.28:r;ctx.lineTo(Math.cos(a)*rad,Math.sin(a)*rad)}ctx.fill();ctx.restore()}
+
+/* ---------- Scene 1: kinetic type ---------- */
+function s1(u){
+  bg(C.blue);
+  txt('Showreel 2026',120,118,`italic 400 52px ${SERIF}`,C.bone);
+  const rows=[['Motion.',400,C.white,0],['Interfaces.',640,null,1],['Intelligence.',880,C.mint,2]];
+  const f=`800 230px ${SANS}`;
+  for(const [s,y,col,i] of rows){
+    const k=E.expo(p(u,.15+i*.22,.9+i*.22));
+    rise(s,120,y,230,f,col,k,i==1?C.white:null);
+  }
+  const k=E.back(p(u,1.3,1.8));
+  if(k>0){ctx.font=f;const w=ctx.measureText('Intelligence.').width;
+    const bx=120+w+90,by=880-60-Math.abs(Math.sin((u-1.3)*7))*140*Math.exp(-(u-1.3)*1.2);
+    ctx.fillStyle=C.pink;ctx.beginPath();ctx.arc(bx,by,50*k,0,7);ctx.fill();}
+  // underline sweeping
+  const sw=E.io(p(u,1.9,2.7));ctx.fillStyle=C.pink;ctx.fillRect(120,918,1500*sw,12);
+}
+
+/* ---------- Scene 2: AI-native UX ---------- */
+function card(x,y,w,h,col,st,u,draw){
+  const k=E.back(p(u,st,st+.7));if(k<=0.001)return;
+  const cx=x+w/2,cy=y+h/2;ctx.save();ctx.translate(cx,cy);ctx.scale(k,k);ctx.translate(-cx,-cy);
+  ctx.globalAlpha=clamp(k*2);ctx.shadowColor='rgba(20,20,80,.25)';ctx.shadowBlur=50;ctx.shadowOffsetY=24;
+  ctx.fillStyle=col;rr(x,y,w,h,44);ctx.fill();ctx.shadowColor='transparent';
+  rr(x,y,w,h,44);ctx.clip();draw(p(u,st+.3,st+1.3),x,y,w,h);ctx.restore();
+}
+function s2(u){
+  bg(C.bone);
+  const full='a calm dashboard for a busy founder';
+  const bw=lerp(130,1060,E.expo(p(u,0,.6))),mv=E.io(p(u,1.55,2.15));
+  const yc=lerp(540,170,mv),sc=lerp(1,.78,mv),bx=960-bw/2;
+  ctx.save();ctx.translate(960,yc);ctx.scale(sc,sc);ctx.translate(-960,-yc);
+  ctx.shadowColor='rgba(20,20,80,.2)';ctx.shadowBlur=40;ctx.shadowOffsetY=16;ctx.fillStyle='#fff';rr(bx,yc-65,bw,130,65);ctx.fill();ctx.shadowColor='transparent';
+  sparkle(bx+75,yc,32+6*Math.sin(u*6),C.blue,u*1.5);
+  if(bw>700){const n=Math.floor(p(u,.6,1.5)*full.length);
+    txt(full.slice(0,n),bx+135,yc+16,`500 46px ${SANS}`,C.navy);
+    ctx.font=`500 46px ${SANS}`;const tw=ctx.measureText(full.slice(0,n)).width;
+    if(u<1.9&&Math.floor(u*3)%2==0){ctx.fillStyle=C.pink;ctx.fillRect(bx+140+tw,yc-30,4,58)}}
+  ctx.restore();
+  const click=u>2.85?Math.sin(p(u,2.85,3.1)*Math.PI):0;
+  card(250,330,560,580,C.pink,1.75,u,(c,x,y,w,h)=>{
+    txt('This week',x+44,y+90,`italic 400 56px ${SERIF}`,C.white);
+    const hs=[.45,.7,.55,.9,.65,.8];
+    hs.forEach((v,i)=>{const k=E.out(p(c,i*.08,.6+i*.08));ctx.fillStyle=i==3?C.navy:'rgba(255,255,255,.9)';
+      rr(x+50+i*84,y+h-50-(h-240)*v*k,56,(h-240)*v*k,18);ctx.fill()});
+  });
+  card(850,330,380,270,C.mint,1.87,u,(c,x,y,w,h)=>{
+    const a=E.out(c)*.78;ctx.lineWidth=26;ctx.lineCap='round';ctx.strokeStyle='rgba(11,11,43,.15)';
+    ctx.beginPath();ctx.arc(x+120,y+h/2,70,0,7);ctx.stroke();ctx.strokeStyle=C.navy;
+    ctx.beginPath();ctx.arc(x+120,y+h/2,70,-Math.PI/2,-Math.PI/2+a*Math.PI*2);ctx.stroke();
+    txt(Math.round(a*100)+'%',x+235,y+h/2+22,`700 64px ${SANS}`,C.navy);
+  });
+  card(850,640,380,270,'#fff',1.99,u,(c,x,y,w,h)=>{
+    for(let i=0;i<3;i++){const k=E.out(p(c,i*.15,.5+i*.15));
+      ctx.fillStyle=[C.blue,C.pink,C.mint][i];ctx.beginPath();ctx.arc(x+60,y+65+i*72,22*k,0,7);ctx.fill();
+      ctx.fillStyle='#E3E0FA';rr(x+105,y+52+i*72,(190-i*40)*k,26,13);ctx.fill()}
+  });
+  card(1270,330,400,580,C.blue,2.11,u,(c,x,y,w,h)=>{
+    txt(Math.round(E.out(c)*92)+'%',x+40,y+300,`italic 400 190px ${SERIF}`,C.white);
+    txt('calm score',x+46,y+370,`500 42px ${SANS}`,C.bone);
+    ctx.fillStyle=C.pink;ctx.beginPath();ctx.arc(x+w-80,y+90,28+click*10,0,7);ctx.fill();
+  });
+  // cursor
+  const cp=E.io(p(u,2.4,3.0)),cx=lerp(1750,1050,cp),cy=lerp(1000,490,cp);
+  if(u>2.3){ctx.save();ctx.translate(cx,cy);ctx.scale(1-click*.12,1-click*.12);ctx.fillStyle=C.navy;ctx.strokeStyle='#fff';ctx.lineWidth=5;
+    ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,56);ctx.lineTo(16,43);ctx.lineTo(28,70);ctx.lineTo(40,64);ctx.lineTo(28,38);ctx.lineTo(48,36);ctx.closePath();ctx.stroke();ctx.fill();ctx.restore();
+    if(click>0){ctx.strokeStyle=C.pink;ctx.lineWidth=6;ctx.globalAlpha=1-p(u,2.85,3.3);ctx.beginPath();ctx.arc(1050,490,20+p(u,2.85,3.3)*90,0,7);ctx.stroke();ctx.globalAlpha=1}}
+}
+
+/* ---------- Scene 3: systems ---------- */
+function s3(u){
+  bg(C.navy);
+  const pal=[C.blue,C.pink,C.mint,C.white];
+  for(let j=0;j<5;j++)for(let i=0;i<11;i++){
+    const d=Math.hypot(i-5,j-2),x=210+i*150,y=270+j*140;
+    const sc=E.back(p(u,d*.06,d*.06+.55));if(sc<=0)continue;
+    const m=(Math.sin(u*4.2-d*.8)+1)/2,half=44*(.62+.5*m)*sc;
+    ctx.save();ctx.translate(x,y);ctx.rotate(m*Math.PI/2);ctx.fillStyle=pal[(i+j)%4];
+    rr(-half,-half,half*2,half*2,lerp(half,10,m));ctx.fill();ctx.restore();
+  }
+  txt('A system that moves as one.',210,150,`italic 400 84px ${SERIF}`,C.white);
+  const n=Math.floor(E.out(p(u,.3,2.3))*240);
+  txt(String(n),210,1010,`800 160px ${SANS}`,C.mint);
+  ctx.font=`800 160px ${SANS}`;const w=ctx.measureText('240').width;
+  txt('components, one motion language',210+w+36,1010,`500 46px ${SANS}`,C.bone);
+}
+
+/* ---------- Scene 4: direction ---------- */
+const RING='storyboards + motion + prototypes + systems + direction + ';
+function s4(u){
+  bg(C.pink);
+  const k=E.expo(p(u,0,.8)),cols=[C.navy,C.blue,C.white,C.mint,C.blue];
+  for(let i=0;i<5;i++){
+    const a=u*1.7+i*Math.PI*2/5,r=190*(.55+.45*Math.sin(u*2.2+i))*k;
+    ctx.fillStyle=cols[i];ctx.beginPath();ctx.arc(960+Math.cos(a)*r,540+Math.sin(a)*r,(120+30*Math.sin(u*3+i))*k,0,7);ctx.fill();
+  }
+  ctx.save();ctx.translate(960,540);ctx.rotate(-u*.55+E.out(p(u,0,1.2))*1.2);ctx.font=`600 46px ${SANS}`;ctx.fillStyle=C.navy;ctx.textBaseline='middle';
+  const R=430,str=RING.repeat(3);let tot=0;for(const ch of str)tot+=ctx.measureText(ch).width;
+  const scl=(Math.PI*2*R)/tot;let acc=0;
+  for(const ch of str){const cw=ctx.measureText(ch).width;const a=(acc+cw/2)*scl/R;acc+=cw;
+    ctx.save();ctx.rotate(a);ctx.translate(0,-R);ctx.scale(scl,scl);ctx.textAlign='center';ctx.globalAlpha=E.out(p(u,.2,1.1));ctx.fillText(ch,0,0);ctx.restore()}
+  ctx.restore();
+  txt('Taste, with a spec sheet.',100,150,`italic 400 84px ${SERIF}`,C.navy);
+  txt('Art direction',1820,990,`700 70px ${SANS}`,C.navy,'right');
+}
+
+/* ---------- Scene 5: title ---------- */
+function s5(u){
+  bg(C.blue);
+  rise(NAME,120,470,280,`800 280px ${SANS}`,C.white,E.expo(p(u,.1,.9)));
+  const k=E.expo(p(u,.6,1.4));ctx.globalAlpha=k;txt('UX designer and creative director for AI-native products.',124,600-(1-k)*20,`italic 400 72px ${SERIF}`,C.bone);ctx.globalAlpha=1;
+  ctx.fillStyle=C.mint;ctx.fillRect(120,690,1680*E.io(p(u,.9,1.7)),8);
+  rise("Let's make something move.",120,930,120,`700 120px ${SANS}`,C.mint,E.expo(p(u,1.3,2.1)));
+  const dk=E.back(p(u,1.8,2.3));if(dk>0){ctx.font=`700 120px ${SANS}`;const w=ctx.measureText("Let's make something move.").width;
+    ctx.fillStyle=C.pink;ctx.beginPath();ctx.arc(120+w+70,900,(32+5*Math.sin(u*7))*dk,0,7);ctx.fill()}
+}
+
+const S=[{s:0,e:3,f:s1},{s:3,e:6.5,f:s2},{s:6.5,e:9.5,f:s3},{s:9.5,e:12.5,f:s4},{s:12.5,e:15,f:s5}];
+const ORG=[[960,540],[1920,0],[0,1080],[1920,1080],[960,540]];
+function render(t){
+  let i=S.findIndex(x=>t>=x.s&&t<x.e);if(i<0)i=S.length-1;
+  const sc=S[i],u=t-sc.s,tr=p(u,0,.6);
+  if(i>0&&tr<1){
+    const pv=S[i-1];pv.f(pv.e-pv.s);
+    ctx.save();ctx.beginPath();ctx.arc(ORG[i][0],ORG[i][1],E.io(tr)*1500,0,7);ctx.clip();sc.f(u);ctx.restore();
+  }else sc.f(u);
+}
+
+/* ---------- player ---------- */
+const pp=document.getElementById('pp'),sl=document.getElementById('sc'),tm=document.getElementById('tm');
+let t=0,playing=!matchMedia('(prefers-reduced-motion: reduce)').matches,last=performance.now();
+function ui(){pp.textContent=playing?'Pause':'Play';sl.value=t;tm.textContent=t.toFixed(1)+' / 15.0s'}
+function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;if(playing){t+=dt;if(t>=DUR)t=0}render(t);ui();requestAnimationFrame(loop)}
+pp.onclick=()=>{playing=!playing};
+document.getElementById('stage').onclick=()=>{playing=!playing};
+sl.oninput=()=>{t=parseFloat(sl.value)};
+addEventListener('keydown',e=>{if(e.code==='Space'&&e.target===document.body){e.preventDefault();playing=!playing}});
+const go=()=>{last=performance.now();requestAnimationFrame(loop)};
+Promise.race([Promise.all([document.fonts.load(`800 100px "Bricolage Grotesque"`),document.fonts.load(`italic 400 50px "Instrument Serif"`)]),new Promise(r=>setTimeout(r,2500))]).then(go,go);
+</script>
+<script src="tabs.js" defer></script>
+</body>
+</html>

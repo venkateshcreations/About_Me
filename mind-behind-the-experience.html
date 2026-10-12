@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- PT-SEO -->
+<meta name="description" content="A 15-second cinematic identity film: think beyond interfaces. Venkatesh Ammireddy — UX Creative Director, Product UX Architect, Design Engineer." />
+<link rel="canonical" href="https://venkateshcreations.github.io/About_Me/mind-behind-the-experience.html" />
+<meta name="theme-color" content="#0b0b0e" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://venkateshcreations.github.io/About_Me/mind-behind-the-experience.html" />
+<meta property="og:title" content="The Mind Behind the Experience — Venkatesh Ammireddy | UX Identity Film" />
+<meta property="og:description" content="A 15-second cinematic identity film: think beyond interfaces. Venkatesh Ammireddy — UX Creative Director, Product UX Architect, Design Engineer." />
+<meta property="og:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:title" content="The Mind Behind the Experience — Venkatesh Ammireddy | UX Identity Film" />
+<meta property="twitter:description" content="A 15-second cinematic identity film: think beyond interfaces. Venkatesh Ammireddy — UX Creative Director, Product UX Architect, Design Engineer." />
+<meta property="twitter:image" content="https://venkateshcreations.github.io/portfolio/assets/profile.jpg" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Mind Behind the Experience — Venkatesh Ammireddy | UX Identity Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#04050B;--fg:#EAF0FF;--acc:#4C7DFF;color-scheme:dark}
+html,body{margin:0;height:100%;background:var(--bg);overflow:hidden;font-family:Sora,"Helvetica Neue",Arial,sans-serif}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+#bar{position:fixed;left:0;bottom:0;height:2px;width:100%;transform-origin:left;transform:scaleX(0);background:linear-gradient(90deg,#4C7DFF,#8B5CF6);opacity:.85}
+#rp{position:fixed;right:max(18px,env(safe-area-inset-right,0px));bottom:calc(20px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:10px;padding:10px 18px;border-radius:999px;border:1px solid rgba(160,185,255,.35);background:rgba(10,14,30,.55);color:var(--fg);font:600 13px/1 Sora,Arial,sans-serif;letter-spacing:.08em;cursor:pointer;opacity:.4;transition:opacity .4s}
+#rp:hover,#rp:focus-visible,#rp.end{opacity:1}
+#rp:focus-visible{outline:2px solid #FF8A3D;outline-offset:3px}
+</style>
+<link rel="stylesheet" href="tabs.css">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+</head>
+<body>
+<canvas id="c" role="img" aria-label="Fifteen second identity film. Think beyond interfaces. Venkatesh Ammireddy: UX Creative Director, Product UX Architect, Design Engineer. Human-centered thinking. AI-driven experience. Engineering-ready design. From complexity to clarity. UX strategy, product design, engineering."></canvas>
+<div id="bar"></div>
+<button id="rp" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg><span id="rl">Replay</span></button>
+<script>
+const FPS=30,DUR=15,FONT='Sora,"Helvetica Neue",Arial,sans-serif';
+const cv=document.getElementById('c'),ctx=cv.getContext('2d'),bar=document.getElementById('bar'),rp=document.getElementById('rp'),rl=document.getElementById('rl');
+const clamp=(x,a=0,b=1)=>Math.min(b,Math.max(a,x)),p=(t,a,b)=>clamp((t-a)/(b-a)),lerp=(a,b,k)=>a+(b-a)*k;
+const E={out:x=>1-Math.pow(1-x,4),in:x=>x*x*x,io:x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,expo:x=>x>=1?1:1-Math.pow(2,-10*x)};
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const R=rng(2026),CO=['255,150,80','255,255,255','110,150,255','160,120,255'];
+const dust=Array.from({length:480},()=>({x:R(),y:R(),z:.15+R()*.85,s:.6+R()*1.6,ph:R()*6.28,v:R(),c:R()<.04?0:R()<.4?1:R()<.7?2:3,ap:R()*1.8}));
+const BR=Array.from({length:40},()=>Array.from({length:8},()=>({a:R()*6.28,s:.5+R()*2.2,z:.6+R()*1.4,c:['#fff','#8FB0FF','#A78BFA'][Math.floor(R()*3)]})));
+const SR=Array.from({length:120},()=>({x:R(),y:R(),b:R()-.5}));
+const SS=Array.from({length:40},()=>({ox:R()*2-1,oy:R()*2-1,rx:.8+R()*.9}));
+const NODES=Array.from({length:120},(_,i)=>({bx:R(),by:R(),ax:.05+R()*.12,ay:.05+R()*.12,f:.3+R()*.7,ph:R()*6.28,c:R()<.15?'255,255,255':R()<.5?'110,150,255':'160,120,255'}));
+const HALO=Array.from({length:260},()=>({r:R()*2-1,ph:R()*6.28,z:.4+R()*.6}));
+
+let W=0,H=0,dpr=1,P=false,Ud=1,burst=[];
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=cv.clientWidth;H=cv.clientHeight;cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
+
+/* ---- type engine ---- */
+let cwc={};
+function cw(ch,w){const k=w+ch;if(cwc[k]===undefined){ctx.font=`${w} 100px ${FONT}`;cwc[k]=ctx.measureText(ch).width/100}return cwc[k]}
+function lineW(l,s,tr,w){let a=0;const c=[...l];for(const ch of c)a+=cw(ch,w)*s;return a+tr*s*(c.length-1)}
+function fitSize(L,tr,w,maxW,maxS){let m=1;for(const l of L)m=Math.max(m,lineW(l,100,tr,w));return Math.min(maxS,100*maxW/m)}
+function glyph(ch,cx,cy,s){
+  if(s.a<=.004)return;
+  const d=(ox,oy,al)=>{ctx.save();ctx.globalAlpha=clamp(al);ctx.translate(cx+(s.dx||0)+ox,cy+(s.dy||0)+oy);ctx.rotate(s.rot||0);
+    const k=s.sc||1;ctx.scale(k,k*Math.cos(s.rx||0));if(s.glow){ctx.shadowColor=s.gc||'#4C7DFF';ctx.shadowBlur=s.glow}
+    ctx.fillStyle=s.col||'#F4F7FF';ctx.fillText(ch,0,0);ctx.restore()};
+  if(s.bx||s.by){d(s.bx||0,s.by||0,s.a*.16);d((s.bx||0)*.5,(s.by||0)*.5,s.a*.28)}
+  d(0,0,s.a);
+}
+function put(L,o,fn){
+  const{x,y,size,tr=.04,w=700,al='c',lh=1.1}=o;
+  ctx.font=`${w} ${size}px ${FONT}`;ctx.textAlign='center';ctx.textBaseline='middle';
+  const ws=L.map(l=>lineW(l,size,tr,w)),mx=Math.max(...ws);let gi=0;
+  L.forEach((l,li)=>{
+    const c=[...l];let cur=al==='c'?x-ws[li]/2:al==='r'?x-ws[li]:x;const yy=y+li*size*lh;
+    c.forEach((ch,i)=>{const wd=cw(ch,w)*size,cx=cur+wd/2;cur+=wd+tr*size;
+      if(ch!==' ')glyph(ch,cx,yy,fn?fn({li,i,n:c.length,gi,cx,cy:yy,ch,nx:i/Math.max(1,c.length-1)}):{a:1});gi++});
+  });
+  return{x0:al==='c'?x-mx/2:al==='r'?x-mx:x,w:mx};
+}
+function hair(x1,x2,y,k,a){if(k<=.001)return;const cx=(x1+x2)/2,hw=(x2-x1)/2*k,g=ctx.createLinearGradient(cx-hw,0,cx+hw,0);
+  g.addColorStop(0,'rgba(76,125,255,0)');g.addColorStop(.3,`rgba(110,150,255,${a})`);g.addColorStop(.7,`rgba(150,120,255,${a})`);g.addColorStop(1,'rgba(139,92,246,0)');
+  ctx.fillStyle=g;ctx.fillRect(cx-hw,y-.75,hw*2,1.5)}
+
+/* ---- camera, background, dust ---- */
+function cam(t){
+  let s=1+.1*E.io(p(t,0,3));
+  if(t>=3)s=1.1-.07*E.io(p(t,3,6));
+  if(t>=6)s=1.03-.03*E.io(p(t,6,9.2));
+  s+=.3*E.io(p(t,9.2,10.1))*(1-E.io(p(t,10.1,10.5)));
+  s+=.04*(1-E.out(p(t,10.5,13)))*p(t,10.5,10.6)+.015*p(t,13,15);
+  const q=1-p(t,10.2,11);
+  return{s,x:Math.sin(t*.45)*W*.006,y:Math.cos(t*.38)*H*.006,r:Math.sin(t*.3)*.004*q};
+}
+function bgdraw(t){
+  ctx.fillStyle='#04050B';ctx.fillRect(0,0,W,H);
+  const e=.25+.75*E.out(p(t,0,3.5)),m=Math.max(W,H)*.75;
+  let g=ctx.createRadialGradient(W*(.15+.04*Math.sin(t*.3)),H,0,W*.15,H,m);g.addColorStop(0,`rgba(60,90,255,${.17*e})`);g.addColorStop(1,'rgba(60,90,255,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  g=ctx.createRadialGradient(W*.9,H*(.05+.03*Math.cos(t*.25)),0,W*.9,0,m);g.addColorStop(0,`rgba(139,92,246,${.14*e*(1+.5*p(t,6,9))})`);g.addColorStop(1,'rgba(139,92,246,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+}
+function dustdraw(t,c){
+  const warp=E.io(p(t,9.2,9.9))*(1-E.io(p(t,10.1,10.5)));
+  ctx.globalCompositeOperation='lighter';
+  for(const d of dust){
+    const L=clamp((t-.15-d.ap)/1.2);if(L<=0)continue;
+    const px=((d.x+t*.004*d.z*(.3+d.v)+c.x*.0004*d.z)%1+1)%1*W,py=((d.y-t*.006*d.z*(.3+d.v)+c.y*.0004*d.z)%1+1)%1*H;
+    const a=(.3+.7*(.5+.5*Math.sin(t*1.7+d.ph)))*d.z*.75*L,sz=d.s*d.z*1.3*Ud;
+    ctx.fillStyle=`rgba(${CO[d.c]},${a})`;
+    if(warp>.02){const dx=px-W/2,dy=py-H/2,k=warp*d.z*.32;ctx.strokeStyle=`rgba(${CO[d.c]},${a*.8})`;ctx.lineWidth=Math.max(1,sz*.8);ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+dx*k,py+dy*k);ctx.stroke()}
+    else ctx.fillRect(px,py,sz,sz);
+  }
+  ctx.globalCompositeOperation='source-over';
+}
+
+/* ---- scene 1: the spark ---- */
+function beamdraw(x,a){
+  let g=ctx.createLinearGradient(x-90,0,x+90,0);g.addColorStop(0,'rgba(76,125,255,0)');g.addColorStop(.5,`rgba(120,150,255,${.22*a})`);g.addColorStop(1,'rgba(76,125,255,0)');
+  ctx.fillStyle=g;ctx.fillRect(x-90,0,180,H);
+  g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(255,225,200,0)');g.addColorStop(.5,`rgba(255,228,205,${.95*a})`);g.addColorStop(1,'rgba(255,225,200,0)');
+  ctx.fillStyle=g;ctx.fillRect(x-1,0,2,H);
+}
+function sc1(t){
+  if(t>3.05)return;
+  const L=P?['THINK','BEYOND','INTERFACES.']:['THINK BEYOND','INTERFACES.'];
+  const size=fitSize(L,.1,700,W*.84,Math.min(H*.2,W*.2)),tr=lerp(.1,.04,E.out(p(t,.3,2.6)));
+  const bx=lerp(-.06*W,1.06*W,E.io(p(t,.35,2.0))),ba=E.out(p(t,.3,.6))*(1-E.io(p(t,1.85,2.1)));
+  burst=[];
+  put(L,{x:W/2,y:H*.5-(L.length-1)*size*.55,size,tr,w:700,lh:1.1},g=>{
+    const r=clamp((bx-g.cx)/(.16*W)),k=E.out(r),ex=E.io(clamp((t-2.45-g.nx*.35)/.5));burst.push(g);
+    return{a:k*(1-ex),sc:lerp(1.3,1,k)*(1+ex*.08),dy:(1-k)*size*.15-ex*size*.12,bx:(1-k)*size*.25,glow:18*(1-ex)*Math.min(1,r*3)};
+  });
+  if(ba>.01)beamdraw(bx,ba);
+  if(t>2.45){ctx.globalCompositeOperation='lighter';
+    for(const g of burst)for(const b of BR[g.gi%40]){const dt=clamp((t-2.5-g.nx*.2)/1.3);if(dt<=0||dt>=1)continue;
+      const d=E.out(dt)*size*b.s;ctx.globalAlpha=(1-dt)*.85;ctx.fillStyle=b.c;const z=b.z*Ud*1.7;
+      ctx.fillRect(g.cx+Math.cos(b.a)*d,g.cy+Math.sin(b.a)*d-dt*size*.3,z,z)}
+    ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over'}
+}
+
+/* ---- scene 2: the identity ---- */
+function sc2(t){
+  if(t<3||t>6.05)return;
+  const NL=['VENKATESH','AMMIREDDY'],sz=fitSize(NL,0,800,W*.82,Math.min(H*.27,W*.3));
+  if(t<4.6)put(NL,{x:W/2,y:H*.5-sz*.5,size:sz,tr:.01,w:800,lh:.98},g=>{
+    const k=E.expo(clamp((t-3-g.i*.04-g.li*.1)/.7)),ex=E.io(clamp((t-4-g.i*.02)/.45)),d=g.li?-1:1;
+    return{a:k*(1-ex),dx:(1-k)*W*.5*d,dy:-ex*sz*.5,bx:(1-k)*sz*.8*d,by:ex*sz*.2,rx:(1-k)*1.1,sc:1+ex*.1,glow:10*k};});
+  const la=E.out(p(t,4.4,4.9))*(1-p(t,5.8,6));
+  if(la>0)put(['VENKATESH AMMIREDDY'],{x:W*.06,y:H*.09,size:Math.max(12,Math.min(W,H*1.78)*.0155),tr:.28,w:600,al:'l'},()=>({a:la*.75,col:'#C9D4FF'}));
+  const S=P?[['UX','CREATIVE','DIRECTOR'],['PRODUCT','UX','ARCHITECT'],['DESIGN','ENGINEER']]:[['UX CREATIVE DIRECTOR'],['PRODUCT UX ARCHITECT'],['DESIGN ENGINEER']];
+  const T=[[4.15,4.9,'c',700,.15],[4.8,5.45,'l',300,.17],[5.4,6,'c',800,.25]];
+  T.forEach(([s,e,al,w,mf],k)=>{
+    if(t<s-.01||t>e+.01)return;
+    const sz=fitSize(S[k],.06,w,W*.82,Math.min(H*mf,W*mf)),n=S[k].length,y=H*.5-(n-1)*sz*.55,dir=k%2?-1:1;
+    const x=al==='l'?W*(P?.08:.1):W/2,z=lerp(.93,1,E.out(p(t,s,s+.6)));
+    ctx.save();ctx.translate(W/2,H/2);ctx.scale(z,z);ctx.translate(-W/2,-H/2);
+    const b=put(S[k],{x,y,size:sz,tr:.06,w,al,lh:1.1},g=>{
+      const R=SS[(g.gi+k*9)%40],a=E.expo(clamp((t-s-g.gi*.014)/.4)),ex=E.in(clamp((t-(e-.2)-g.gi*.006)/.2));
+      return{a:clamp(a*1.5)*(1-ex),dx:(1-a)*R.ox*sz*3+dir*ex*sz*1.4,dy:(1-a)*R.oy*sz*2,sc:lerp(.5,1,a),rx:(1-a)*R.rx+ex*.8,bx:(1-a)*sz*.4*Math.sign(R.ox),glow:8};});
+    hair(b.x0,b.x0+b.w,y+(n-1)*sz*1.1+sz*.78,E.out(p(t,s+.3,s+.6))*(1-p(t,e-.2,e)),.7);
+    ctx.restore();
+  });
+}
+
+/* ---- scene 3: the intelligence ---- */
+const ordf=t=>{let m=0;for(const[,s,e]of PHS)m=Math.max(m,E.io(p(t,s+.2,s+.7))*(1-E.io(p(t,e-.25,e+.05))));return m};
+let PHS=[[0,6,7.4],[0,7.4,8.7],[0,8.7,10.05]];
+function npos(n,i,tf,o){const x=(n.bx+n.ax*Math.sin(n.f*tf+n.ph)+.03*Math.sin(n.f*tf*.37+n.ph*2))*W,y=(n.by+n.ay*Math.cos(n.f*tf*.9+n.ph)+.03*Math.cos(n.f*tf*.41))*H;
+  return[lerp(x,(.04+(i%15)/14*.92)*W,o),lerp(y,(.1+Math.floor(i/15)/7*.8)*H,o)]}
+function field(t){
+  const f=E.io(p(t,5.6,6.5))*(1-E.io(p(t,10.1,10.8)));if(f<.01)return;
+  const o=ordf(t),tf=t+2*E.io(p(t,9.2,10.1)),pts=NODES.map((n,i)=>npos(n,i,tf,o));
+  ctx.globalCompositeOperation='lighter';ctx.lineWidth=1;
+  ctx.strokeStyle=`rgba(110,150,255,${.16*f})`;ctx.beginPath();
+  NODES.forEach((n,i)=>{ctx.moveTo(...pts[i]);for(let k=1;k<6;k++)ctx.lineTo(...npos(n,i,tf-k*.07,o))});ctx.stroke();
+  const th=W*.13,lo=1-o;
+  if(lo>.02){ctx.strokeStyle=`rgba(140,170,255,${.14*f*lo})`;ctx.beginPath();
+    for(let i=0;i<120;i++)for(let j=i+1;j<120;j++){const dx=pts[i][0]-pts[j][0],dy=pts[i][1]-pts[j][1];if(dx*dx+dy*dy<th*th){ctx.moveTo(...pts[i]);ctx.lineTo(...pts[j])}}ctx.stroke()}
+  if(o>.02){ctx.strokeStyle=`rgba(150,130,255,${.3*f*o})`;ctx.beginPath();
+    for(let i=0;i<120;i++){if(i%15<14){ctx.moveTo(...pts[i]);ctx.lineTo(...pts[i+1])}if(i<105){ctx.moveTo(...pts[i]);ctx.lineTo(...pts[i+15])}}ctx.stroke()}
+  NODES.forEach((n,i)=>{ctx.fillStyle=`rgba(${n.c},${.8*f})`;const z=2.4*Ud;ctx.fillRect(pts[i][0]-z/2,pts[i][1]-z/2,z,z)});
+  ctx.globalCompositeOperation='source-over';
+}
+function sc3(t){
+  if(t<5.9||t>10.1)return;
+  const A=P?[['HUMAN-','CENTERED','THINKING.'],['AI-DRIVEN','EXPERIENCE.'],['ENGINEERING-','READY','DESIGN.']]:[['HUMAN-CENTERED','THINKING.'],['AI-DRIVEN','EXPERIENCE.'],['ENGINEERING-READY','DESIGN.']];
+  A.forEach((L,pi)=>{
+    const[,s,e]=PHS[pi];if(t<s||t>e+.02)return;
+    const size=fitSize(L,.06,700,W*.84,Math.min(H*.17,W*.14)),n=L.length,y=H*.5-(n-1)*size*.55;
+    put(L,{x:W/2,y,size,tr:.06,w:700,lh:1.1},g=>{
+      const Rr=SR[(pi*40+g.gi)%120],k=E.io(clamp((t-s-g.gi*.02)/.55)),ex=E.in(clamp((t-(e-.3)-g.gi*.004)/.3)),side=g.li%2?1:-1;
+      const sx=(Rr.x-.5)*W*1.2,sy=(Rr.y-.5)*H*1.2;
+      return{a:clamp(k*2.5)*(1-ex),dx:(1-k)*sx+Math.sin(k*Math.PI)*Rr.b*size*1.5,dy:(1-k)*sy+side*ex*size*1.6,bx:(1-k)*sx*.15,by:(1-k)*sy*.15+side*ex*size*.5,glow:12*k*(1-ex)};});
+    const hk=E.out(p(t,s+.25,s+.7))*(1-E.in(p(t,e-.3,e-.05))),w=Math.max(...L.map(l=>lineW(l,size,.06,700)))*1.04;
+    hair(W/2-w/2,W/2+w/2,y-size*.78,hk,.6);hair(W/2-w/2,W/2+w/2,y+(n-1)*size*1.1+size*.78,hk,.6);
+  });
+}
+
+/* ---- scene 4: the signature ---- */
+function sc4(t){
+  if(t<10.05||t>13.25)return;
+  const HL=['CLARITY.'],hs=fitSize(HL,.16,800,W*(P?.9:.84),Math.min(H*.4,W*.3)),hc=H*.6,trF=.03;
+  const hw=lineW('CLARITY.',hs,trF,800),x0=W/2-hw/2,ss=Math.max(14,hs*.19),ex=E.io(p(t,12.8,13.2)),sa=1-E.io(p(t,12.5,12.9));
+  put(['FROM COMPLEXITY','TO'],{x:x0,y:hc-hs*.5-ss*1.9,size:ss,tr:.2,w:600,al:'l',lh:1.55},g=>{
+    const k=g.li?E.out(clamp((t-10.7-g.i*.05)/.35)):E.expo(clamp((t-10.1-g.i*.035)/.45));
+    return{a:k*sa*.9,dx:(1-k)*ss*1.5,bx:(1-k)*ss*.8,col:'#C9D4FF'};});
+  const k=E.expo(p(t,10.95,12)),sc=lerp(.55,1,k)*(1+ex*.06),tr=lerp(.16,trF,E.expo(p(t,10.95,12.2)));
+  const sp=p(t,11.8,12.5),sw=lerp(x0-hw*.15,x0+hw*1.15,E.io(sp)),swa=Math.sin(Math.PI*sp);
+  ctx.save();ctx.translate(W/2,hc);ctx.scale(sc,sc);ctx.translate(-W/2,-hc);
+  put(HL,{x:W/2,y:hc,size:hs,tr,w:800},g=>{
+    const b=Math.max(0,1-Math.abs(g.cx-sw)/(hw*.14))*swa;
+    return{a:E.out(clamp(k*1.6))*(1-ex),col:g.ch==='.'?'#FF8A3D':b>.05?'#FFFFFF':'#EAF0FF',glow:16+46*b,gc:b>.1?'#8FB0FF':'#4C7DFF'};});
+  ctx.restore();
+  ctx.globalCompositeOperation='lighter';
+  if(swa>.02){ctx.fillStyle=`rgba(200,220,255,${swa*.6})`;ctx.fillRect(sw-1,hc-hs*.55,2,hs*1.1)}
+  const hk=E.out(p(t,11.3,12.5))*(1-ex);
+  if(hk>.01){
+    const rx=hw*.58,ry=hs*.8;
+    ctx.save();ctx.translate(W/2,hc);ctx.scale(1,ry/rx);const g=ctx.createRadialGradient(0,0,0,0,0,rx*1.2);
+    g.addColorStop(0,'rgba(76,125,255,0)');g.addColorStop(.8,'rgba(76,125,255,0)');g.addColorStop(.92,`rgba(120,150,255,${.1*hk})`);g.addColorStop(1,'rgba(120,150,255,0)');
+    ctx.fillStyle=g;ctx.fillRect(-rx*1.3,-rx*1.3,rx*2.6,rx*2.6);ctx.restore();
+    for(let j=0;j<HALO.length;j++){const h=HALO[j],ang=j/HALO.length*6.283+t*.15+h.ph*.2,rad=(1+(1-hk)*2.2)*(1+h.r*.07);
+      ctx.fillStyle=`rgba(${j%5?'160,185,255':'255,255,255'},${hk*(.3+.7*(.5+.5*Math.sin(t*2+h.ph)))*h.z})`;
+      const z=1.6*Ud*(.6+h.z);ctx.fillRect(W/2+Math.cos(ang)*rx*rad,hc+Math.sin(ang)*ry*rad,z,z)}
+  }
+  ctx.globalCompositeOperation='source-over';
+}
+
+/* ---- scene 5: the final frame ---- */
+function sc5(t){
+  if(t<12.95)return;
+  const N=P?['VENKATESH','AMMIREDDY']:['VENKATESH AMMIREDDY'],B=P?['UX STRATEGY ×','PRODUCT DESIGN ×','ENGINEERING']:['UX STRATEGY × PRODUCT DESIGN × ENGINEERING'];
+  const sz=fitSize(N,.22,700,W*.8,P?W*.14:Math.min(H*.11,W*.075)),bs=fitSize(B,.3,400,W*.8,P?W*.04:H*.032);
+  const ny=H*.47-(N.length-1)*sz*.55,ry=ny+(N.length-1)*sz*1.1+sz*.8,by=ry+bs*2.4;
+  const b=put(N,{x:W/2,y:ny,size:sz,tr:lerp(.22,.12,E.out(p(t,13,14))),w:700,lh:1.1},g=>{
+    const k=E.expo(clamp((t-13-g.gi*.03)/.6));return{a:k,dy:(1-k)*sz*.5,glow:6*k};});
+  hair(W/2-b.w*.6,W/2+b.w*.6,ry,E.out(p(t,13.3,13.9)),.9);
+  put(B,{x:W/2,y:by,size:bs,tr:lerp(.3,.22,E.out(p(t,13.5,14.5))),w:400,lh:1.8},g=>{
+    const k=E.out(clamp((t-13.5-g.gi*.012)/.5));return{a:k*.9,dy:(1-k)*bs*.6,col:g.ch==='×'?'#FF8A3D':'#C9D4FF'};});
+}
+
+/* ---- compositor ---- */
+function draw(t){
+  const fr=Math.min(DUR*FPS-1,Math.floor(t*FPS+1e-6)),q=fr/FPS;
+  ctx.setTransform(dpr,0,0,dpr,0,0);P=W<H*.85;Ud=Math.max(.7,Math.min(W/1920,H/1080));
+  bgdraw(q);const c=cam(q);dustdraw(q,c);
+  ctx.save();ctx.translate(W/2+c.x,H/2+c.y);ctx.rotate(c.r);ctx.scale(c.s,c.s);ctx.translate(-W/2,-H/2);
+  field(q);sc1(q);sc2(q);sc3(q);sc4(q);sc5(q);ctx.restore();
+  const v=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*.35,W/2,H/2,Math.max(W,H)*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.55)');
+  ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+  const fo=E.io(p(q,14.6,14.93));if(fo>0){ctx.fillStyle=`rgba(4,5,11,${fo})`;ctx.fillRect(0,0,W,H)}
+  if(t>=DUR){ctx.fillStyle='#04050B';ctx.fillRect(0,0,W,H)}
+  bar.style.transform=`scaleX(${Math.min(1,t/DUR)})`;
+}
+
+/* ---- player ---- */
+const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let t0=0,raf=0,playing=false,tNow=0;
+function frame(now){tNow=Math.min(DUR,(now-t0)/1000);draw(tNow);
+  if(tNow>=DUR){playing=false;rp.classList.add('end');rl.textContent='Replay';return}
+  raf=requestAnimationFrame(frame)}
+function play(){cancelAnimationFrame(raf);rp.classList.remove('end');rl.textContent='Replay';playing=true;t0=performance.now();raf=requestAnimationFrame(frame)}
+rp.onclick=play;
+addEventListener('keydown',e=>{if(e.key==='r'||e.key==='R'){play()}});
+addEventListener('resize',()=>{resize();if(!playing)draw(still?14.4:tNow)});
+function start(){cwc={};resize();
+  if(still){draw(14.4);rp.classList.add('end');rl.textContent='Play film'}else play()}
+Promise.race([Promise.all([document.fonts.load('800 100px Sora'),document.fonts.load('300 100px Sora'),document.fonts.load('400 100px Sora'),document.fonts.load('600 100px Sora'),document.fonts.load('700 100px Sora')]),new Promise(r=>setTimeout(r,2500))]).then(start,start);
+</script>
+<script src="tabs.js" defer></script>
+</body>
+</html>
